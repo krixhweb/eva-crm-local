@@ -82,3 +82,4 @@ export const Icon: React.FC<IconProps> = ({ name, className, ...props }) => {
   // Render icon with merged classes
   return <Component className={cn('flex-shrink-0', className)} {...props} />;
 };
+

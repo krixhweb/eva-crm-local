@@ -6,7 +6,7 @@ import { NodePalette } from '../../components/workflow/NodePalette';
 import { NodeConfigPanel } from '../../components/workflow/NodeConfigPanel';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Icon } from '../../components/shared/Icon';
+import { Icon } from '../../components/shared/icon';
 import { Node } from 'reactflow';
 import { useNavigate } from 'react-router-dom';
 

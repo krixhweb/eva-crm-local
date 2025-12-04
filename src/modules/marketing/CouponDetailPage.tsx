@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Icon } from '../../components/shared/icon';
@@ -201,7 +201,7 @@ const CouponDetailPage = () => {
                                     <YAxis dataKey="name" type="category" width={100} axisLine={false} tickLine={false} />
                                     <Tooltip cursor={{fill: 'transparent'}} />
                                     <Bar dataKey="count" fill="#8884d8" radius={[0, 4, 4, 0]} barSize={30}>
-                                         {segmentData.map((entry, index) => (
+                                         {segmentData.map((_, index) => (
                                             <Cell key={`cell-${index}`} fill={['#3B82F6', '#10B981', '#F59E0B', '#EF4444'][index % 4]} />
                                         ))}
                                     </Bar>

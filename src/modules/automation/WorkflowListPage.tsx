@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
-import { Icon } from "../../components/shared/Icon";
+import { Icon } from "../../components/shared/icon";
 import { mockWorkflows } from '../../data/mockData';
 
 const WorkflowListPage = () => {

@@ -6,7 +6,7 @@ import { Input } from '../../../../components/ui/Input';
 import { Label } from '../../../../components/ui/Label';
 import { Textarea } from '../../../../components/ui/Textarea';
 import { Checkbox } from '../../../../components/ui/Checkbox';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { useGlassyToasts } from '../../../../components/ui/GlassyToastProvider';
 
 interface CreateSocialPostDrawerProps {

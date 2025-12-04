@@ -7,12 +7,11 @@ import { mockCampaigns } from '../../data/mockData';
 import type { Campaign } from '../../types';
 import { CampaignOverview } from './components/campaignDetails/CampaignOverview';
 import { CampaignAnalytics } from './components/campaignDetails/CampaignAnalytics';
-import { 
-  CampaignLeads, 
-  CampaignTimeline, 
-  CampaignActivities, 
-  CampaignNotes, 
-  CampaignFiles 
+import {
+    CampaignLeads,
+    CampaignTimeline,
+    CampaignActivities,
+    CampaignFiles
 } from './components/campaignDetails/CampaignRelated';
 import { Badge } from '../../components/ui/Badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/DropdownMenu';

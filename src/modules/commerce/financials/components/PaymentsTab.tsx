@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from "../../../../components/ui/Card";
 import { Input } from "../../../../components/ui/Input";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../components/ui/Table';
 import { Badge } from '../../../../components/ui/Badge';
 import { formatCurrency } from '../../../../lib/utils';

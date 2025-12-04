@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/Card';
 import { Icon } from '../../../../components/shared/icon';
 import { Button } from '../../../../components/ui/Button';
@@ -87,8 +87,8 @@ const CustomTooltip = ({ active, payload, label, formatter }: any) => {
 
 // --- Data Generators ---
 
-const generateTimelineData = (days: number, type: string) => {
-  return Array.from({ length: days }).map((_, i) => {
+const generateTimelineData = (days: number) => {
+    return Array.from({ length: days }).map((_, i) => {
     const base = Math.floor(Math.random() * 100);
     return {
       day: `Day ${i + 1}`,
@@ -433,7 +433,7 @@ export const CampaignAnalytics: React.FC<CampaignAnalyticsProps> = ({ campaign }
                     </CardHeader>
                     <CardContent>
                         <div className="h-[320px] flex flex-col justify-center gap-4 py-4">
-                            {funnelData.map((stage, index) => {
+                            {funnelData.map(stage => {
                                 const maxVal = funnelData[0].value;
                                 const percentWidth = (stage.value / maxVal) * 100;
                                 return (

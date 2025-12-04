@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
@@ -12,7 +12,8 @@ import { Badge } from '../../components/ui/Badge';
 import { formatCurrency } from '../../lib/utils';
 import { CreateEmailDrawer } from './components/channel/CreateEmailDrawer';
 import { EmailTemplatesTab } from './components/channel/EmailTemplatesTab';
-import { EmailFilterDrawer, EmailFiltersState } from './components/channel/EmailFilterDrawer';
+import { EmailFilterDrawer } from './components/channel/EmailFilterDrawer';
+import type { EmailFiltersState } from './components/channel/EmailFilterDrawer';
 import { EmailMarketingToolbar } from './components/channel/EmailMarketingToolbar';
 import { mockEmailCampaigns } from '../../data/emailMockData';
 import type { EmailCampaign } from '../../types';
@@ -44,7 +45,7 @@ const EmailMarketingPage: React.FC = () => {
     
     // Pagination & Sorting
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(20);
+    const itemsPerPage = 20;
     const [sortConfig, setSortConfig] = useState<{ key: keyof EmailCampaign | string, direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
     
     // Selection & Actions
@@ -340,12 +341,12 @@ const EmailMarketingPage: React.FC = () => {
                                                             {c.sentAt ? new Date(c.sentAt).toLocaleDateString() : c.scheduledFor ? new Date(c.scheduledFor).toLocaleDateString() : new Date(c.createdAt).toLocaleDateString()}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {c.status === 'Sent' || c.status === 'Active' ? (
+                                                            {['Sent','Active'].includes(c.status as string) ? (
                                                                 <span className={`font-medium ${openRate > 20 ? 'text-green-600' : 'text-gray-600'}`}>{openRate.toFixed(1)}%</span>
                                                             ) : '-'}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                             {c.status === 'Sent' || c.status === 'Active' ? (
+                                                             {['Sent','Active'].includes(c.status as string) ? (
                                                                 <span className="font-medium">{clickRate.toFixed(1)}%</span>
                                                              ) : '-'}
                                                         </TableCell>

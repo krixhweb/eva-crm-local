@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
@@ -12,7 +12,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { formatCurrency } from "../../lib/utils";
 import { mockCoupons } from "../../data/mockData";
 import { CreateCouponDrawer } from "./components/coupon/CreateCouponDrawer";
-import { CouponFilterDrawer, CouponFiltersState } from "./components/coupon/CouponFilterDrawer";
+import { CouponFilterDrawer } from "./components/coupon/CouponFilterDrawer";
+import type { CouponFiltersState } from "./components/coupon/CouponFilterDrawer";
 
 const DEFAULT_FILTERS: CouponFiltersState = {
     status: [], type: [], createdBy: '', dateFrom: null, dateTo: null, minUsage: ''

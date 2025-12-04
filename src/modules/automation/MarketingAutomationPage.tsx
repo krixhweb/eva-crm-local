@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
-import { Icon } from "../../components/shared/Icon";
+import { Icon } from "../../components/shared/icon";
 import { formatCurrency } from '../../lib/utils';
 import type { MarketingAutomation } from '../../types';
 import { mockMarketingAutomations } from '../../data/mockData';
