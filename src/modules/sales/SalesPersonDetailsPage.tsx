@@ -1,10 +1,10 @@
 
-import React from 'react';
+// React import not required with automatic JSX runtime
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
-import { Icon } from "../../components/shared/Icon";
+import { Icon } from "../../components/shared/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/Tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/Table";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from "recharts";
@@ -18,7 +18,7 @@ const SalesPersonDetailsPage = () => {
     // Lookup Data
     const member = mockTeamMembers.find(m => m.id === id) || mockTeamMembers[0];
     const activities = mockSalesActivities; // Mock filtered list
-    const deals = mockDeals.filter((d, i) => i % 2 === 0); // Mock filtered list
+    const deals = mockDeals.filter((_, i) => i % 2 === 0); // Mock filtered list
 
     // Mock Charts Data
     const performanceData = [

@@ -1,3 +1,4 @@
+// Select — custom dropdown using our DropdownMenu as the base system.
 
 import * as React from "react";
 import {
@@ -6,110 +7,96 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "./DropdownMenu";
-import { Icon } from "../shared/Icon";
+import { Icon } from "../shared/icon";
 import { cn } from "../../lib/utils";
 
+// Context for passing value + handlers to child components
 interface SelectContextProps {
   value: string;
   onValueChange: (v: string) => void;
   options: Map<string, React.ReactNode>;
   disabled?: boolean;
 }
-
 const SelectContext = React.createContext<SelectContextProps | null>(null);
 
 const useSelect = () => {
-  const context = React.useContext(SelectContext);
-  if (!context) {
-    throw new Error("useSelect must be used within a Select component");
-  }
-  return context;
+  const ctx = React.useContext(SelectContext);
+  if (!ctx) throw new Error("useSelect must be used within a Select");
+  return ctx;
 };
 
 interface SelectProps {
-  value?: string;
+  value?: string;            // controlled value
   onValueChange?: (v: string) => void;
-  defaultValue?: string;
+  defaultValue?: string;     // uncontrolled initial value
   children: React.ReactNode;
   disabled?: boolean;
 }
 
-// Main Select component
+// Main Select wrapper
 export const Select: React.FC<SelectProps> = ({
   value,
-  onValueChange = (_v) => {},
+  onValueChange = () => {},
   defaultValue,
   children,
   disabled,
 }) => {
-  const [internalValue, setInternalValue] = React.useState(defaultValue || '');
-  
+  const [internalValue, setInternalValue] = React.useState(defaultValue || "");
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : internalValue;
 
-  const handleValueChange = (newValue: string) => {
-    if (!isControlled) {
-      setInternalValue(newValue);
-    }
-    onValueChange(newValue);
+  // Sync controlled/uncontrolled value updates
+  const handleValueChange = (next: string) => {
+    if (!isControlled) setInternalValue(next);
+    onValueChange(next);
   };
 
+  // Collect all <SelectItem> labels into a map for display
   const options = React.useMemo(() => {
     const map = new Map<string, React.ReactNode>();
-    React.Children.forEach(children, (child) => {
-      if (React.isValidElement(child) && child.type === SelectContent) {
-        const contentChild = child as React.ReactElement<any>;
-        React.Children.forEach(contentChild.props.children, (item) => {
-          if (React.isValidElement(item) && (item.type === SelectItem)) {
-            const itemElement = item as React.ReactElement<any>;
-            if (itemElement.props.value !== undefined) {
-              map.set(itemElement.props.value, itemElement.props.children);
-            }
-          }
-        });
-      }
+    const topChildren = React.Children.toArray(children);
+    topChildren.forEach((child) => {
+      if (!React.isValidElement(child) || child.type !== SelectContent) return;
+      const inner = React.Children.toArray(child.props.children);
+      inner.forEach((item) => {
+        if (!React.isValidElement(item) || item.type !== SelectItem) return;
+        const props = item.props as { value?: string; children?: React.ReactNode };
+        if (props.value !== undefined) map.set(props.value, props.children);
+      });
     });
     return map;
   }, [children]);
 
-  const contextValue = {
-    value: currentValue,
-    onValueChange: handleValueChange,
-    options,
-    disabled,
-  };
-
   return (
-    <SelectContext.Provider value={contextValue}>
-      <DropdownMenu>
-        {children}
-      </DropdownMenu>
+    <SelectContext.Provider
+      value={{ value: currentValue, onValueChange: handleValueChange, options, disabled }}
+    >
+      <DropdownMenu>{children}</DropdownMenu>
     </SelectContext.Provider>
   );
 };
 
-
-// SelectTrigger component
+// Trigger — button that opens the dropdown
 export const SelectTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement>
->(({ children, className, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
   const { disabled } = useSelect();
-  const isDisabled = disabled || props.disabled;
 
   return (
     <DropdownMenuTrigger asChild>
       <button
         ref={ref}
-        disabled={isDisabled}
+        disabled={disabled || props.disabled}
         {...props}
         className={cn(
-          "flex items-center justify-between border rounded-md bg-white dark:bg-black/20 dark:border-dark-border text-sm px-3 h-9 w-full text-left text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500",
-          isDisabled && "opacity-50 cursor-not-allowed",
+          "flex items-center justify-between border rounded-md bg-white dark:bg-black/20 dark:border-dark-border",
+          "text-sm px-3 h-9 w-full text-left text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500",
+          (disabled || props.disabled) && "opacity-50 cursor-not-allowed",
           className
         )}
       >
-        <span className="truncate w-full text-left">{children}</span>
+        <span className="truncate w-full">{children}</span>
         <Icon name="chevronDown" className="h-4 w-4 text-gray-500 ml-2 flex-shrink-0" />
       </button>
     </DropdownMenuTrigger>
@@ -117,41 +104,31 @@ export const SelectTrigger = React.forwardRef<
 });
 SelectTrigger.displayName = "SelectTrigger";
 
-
-// SelectValue component
-export const SelectValue = ({ placeholder, children }: { placeholder?: string; children?: React.ReactNode }) => {
+// SelectValue — shows the active option label
+export const SelectValue = ({
+  placeholder,
+  children,
+}: {
+  placeholder?: string;
+  children?: React.ReactNode;
+}) => {
   const { value, options } = useSelect();
-  const selectedContent = options.get(value);
-  
-  if (children) {
-    return <>{children}</>;
-  }
 
-  if (selectedContent) {
-    return <>{selectedContent}</>;
-  }
-  
-  if (placeholder) {
-    return <span className="text-gray-500 dark:text-gray-400">{placeholder}</span>;
-  }
-  
+  if (children) return <>{children}</>;
+  if (options.get(value)) return <>{options.get(value)}</>;
+  if (placeholder) return <span className="text-gray-500 dark:text-gray-400">{placeholder}</span>;
   return <>{value}</>;
 };
 SelectValue.displayName = "SelectValue";
 
-
-// SelectContent component
+// Content — dropdown body container
 export const SelectContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <DropdownMenuContent>{children}</DropdownMenuContent>;
 };
-SelectContent.displayName = 'SelectContent';
+SelectContent.displayName = "SelectContent";
 
-
-// SelectItem component
-export const SelectItem: React.FC<{
-  value: string;
-  children: React.ReactNode;
-}> = ({
+// SelectItem — individual option
+export const SelectItem: React.FC<{ value: string; children: React.ReactNode }> = ({
   value,
   children,
 }) => {
@@ -163,4 +140,4 @@ export const SelectItem: React.FC<{
     </DropdownMenuItem>
   );
 };
-SelectItem.displayName = 'SelectItem';
+SelectItem.displayName = "SelectItem";

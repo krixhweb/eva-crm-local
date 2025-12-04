@@ -6,7 +6,7 @@ import { Input } from '../../../components/ui/Input';
 import { Label } from '../../../components/ui/Label';
 import { Textarea } from '../../../components/ui/Textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/Select';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 import { DatePicker } from '../../../components/ui/DatePicker';
 import { mockTeamMembers } from '../../../data/mockData';
 import { cn } from '../../../lib/utils';

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Button } from "../../../../components/ui/Button";
 import { Input } from "../../../../components/ui/Input";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { LeadsFilterDrawer } from "./LeadsFilterDrawer";
 import { Badge } from "../../../../components/ui/Badge";
 import { Card } from "../../../../components/ui/Card";

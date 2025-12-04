@@ -1,7 +1,7 @@
 
-import React, { useMemo, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Icon } from '../../components/shared/Icon';
+import { useMemo, useState } from 'react';
+import { Card, CardTitle } from '../../components/ui/Card';
+import { Icon } from '../../components/shared/icon';
 import { Button } from '../../components/ui/Button';
 import { DatePicker } from '../../components/ui/DatePicker';
 import {
@@ -118,7 +118,7 @@ const DashboardPage: React.FC = () => {
         <div className="w-full md:w-auto">
             <DatePicker 
               mode="range" 
-              value={dateRange} 
+              value={dateRange ?? null} 
               onChange={(val) => setDateRange(val)} 
               className="w-full md:w-[260px]"
             />

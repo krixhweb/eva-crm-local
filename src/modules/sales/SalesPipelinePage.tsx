@@ -1,11 +1,11 @@
 
-import React, { useMemo, useState, useRef } from "react";
+import { useMemo, useState } from "react";
 import { useSelector } from 'react-redux';
 import Dashboard from "./components/leads/Dashboard";
 import Toolbar from "./components/leads/Toolbar";
 import PipelineAndTable from "./components/leads/PipelineAndTable";
-import { useGlassyToasts } from "../../../components/ui/GlassyToastProvider";
-import CreateLeadModal from "../../../components/modals/CreateLeadModal";
+import { useGlassyToasts } from "../../components/ui/GlassyToastProvider";
+import CreateLeadModal from "../../components/modals/CreateLeadModal";
 import type { Deal, LeadFormData } from '../../types';
 import { mockDeals } from '../../data/mockData';
 import type { RootState } from '../../store/store';
@@ -258,7 +258,7 @@ const SalesPipelinePage: React.FC = () => {
           priorityValue={priorityValue}
           dateFrom={dateFrom}
           dateTo={dateTo}
-          onChange={(p) => handleToolbarChange(p)}
+          onChange={(p: any) => handleToolbarChange(p)}
           onRefresh={handleRefresh}
           onExport={handleExport}
           onImportFile={handleImportFile}

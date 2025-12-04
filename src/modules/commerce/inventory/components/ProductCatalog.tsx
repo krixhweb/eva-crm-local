@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../../components
 import { Input } from "../../../../components/ui/Input";
 import { Badge } from "../../../../components/ui/Badge";
 import { Button } from "../../../../components/ui/Button";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/Table";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../../../../components/ui/DropdownMenu";
 import type { Product } from "../../../../types";

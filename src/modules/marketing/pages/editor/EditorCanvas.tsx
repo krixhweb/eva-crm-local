@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { cn } from "../../../../lib/utils";
 import type { Block, ColumnData } from "./editorTypes";
 

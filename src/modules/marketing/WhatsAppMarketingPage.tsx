@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { Input } from "../../components/ui/Input";
-import { Icon } from "../../components/shared/Icon";
+import { Icon } from "../../components/shared/icon";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { CreateWhatsAppDrawer } from './components/channel/CreateWhatsAppDrawer';
 

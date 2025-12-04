@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from "../../../../components/ui/Card";
 import { Button } from "../../../../components/ui/Button";
 import { Input } from "../../../../components/ui/Input";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../components/ui/Table';
 import { formatCurrency } from '../../../../lib/utils';
 import { StatusBadge } from '../../../../components/ui/StatusBadge';

@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Button } from "../../../components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/Card";
 import { Badge } from "../../../components/ui/Badge";
-import { Icon } from "../../../components/shared/Icon";
+import { Icon } from "../../../components/shared/icon";
 import { Input } from "../../../components/ui/Input";
 import { Textarea } from "../../../components/ui/Textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/Tabs";

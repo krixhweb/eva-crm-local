@@ -1,9 +1,13 @@
+/* Button.tsx — Reusable button component with variants (default, outline, ghost, etc)
+   Purpose: Provides consistent button styling + optional motion animation across the app.
+*/
 
 import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
 
+/* --- Button style variants for color + size --- */
 const buttonVariants = cva(
   'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none relative overflow-hidden',
   {
@@ -21,46 +25,47 @@ const buttonVariants = cva(
         icon: 'h-9 w-9',
       },
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
+    defaultVariants: { variant: 'default', size: 'default' },
   }
 );
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    asMotion?: boolean;
-    variant?: "default" | "destructive" | "outline" | "ghost" | "link" | null;
-    size?: "default" | "sm" | "icon" | null;
+/* --- Props: supports variant, size, and motion toggle --- */
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asMotion?: boolean; // enables framer-motion animation
+  variant?: VariantProps<typeof buttonVariants>['variant'];
+  size?: VariantProps<typeof buttonVariants>['size'];
 }
 
+/* --- Button Component --- */
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asMotion = true, ...props }, ref) => {
-    
+
+    // motion.button for animated press effect
     if (asMotion) {
-        return (
-            <motion.button
-                className={cn(buttonVariants({ variant, size, className }))}
-                ref={ref}
-                {...({
-                    whileTap: { scale: 0.97 },
-                    transition: { type: "spring", stiffness: 400, damping: 15 }
-                } as any)}
-                {...(props as any)}
-            />
-        );
+      // Cast props/ref to any to avoid framer-motion type incompatibilities
+      // between MotionProps and standard HTML button props in some TS setups.
+      return (
+        <motion.button
+          ref={ref as any}
+          className={cn(buttonVariants({ variant, size, className }))}
+          whileTap={{ scale: 0.97 }} // press animation
+          transition={{ type: "spring", stiffness: 400, damping: 15 }}
+          {...(props as any)}
+        />
+      );
     }
 
+    // normal button (no animation)
     return (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        className={cn(buttonVariants({ variant, size, className }))}
         {...props}
       />
     );
   }
 );
+
 Button.displayName = 'Button';
 
 export { Button, buttonVariants };

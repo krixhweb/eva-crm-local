@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
-import { Icon } from "../../components/shared/Icon";
+import { Icon } from "../../components/shared/icon";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../components/ui/DropdownMenu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs';

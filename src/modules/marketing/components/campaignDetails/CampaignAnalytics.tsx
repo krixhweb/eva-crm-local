@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/Card';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Button } from '../../../../components/ui/Button';
 import { formatCurrency } from '../../../../lib/utils';
 import { useGlassyToasts } from '../../../../components/ui/GlassyToastProvider';

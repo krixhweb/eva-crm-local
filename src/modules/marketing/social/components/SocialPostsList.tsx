@@ -6,7 +6,7 @@ import { SocialPost, PLATFORM_CONFIG, Platform } from '../types';
 import { Card, CardContent } from '../../../../components/ui/Card';
 import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Checkbox } from '../../../../components/ui/Checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/Select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../../components/ui/Table';

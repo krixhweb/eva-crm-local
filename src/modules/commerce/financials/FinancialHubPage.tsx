@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/Button";
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/Tabs";
-import { Icon } from "../../../components/shared/Icon";
+import { Icon } from "../../../components/shared/icon";
 import { formatCurrency } from "../../../lib/utils";
 import { useGlassyToasts } from "../../../components/ui/GlassyToastProvider";
 

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/Card";
-import { Icon } from "../../../components/shared/Icon";
+import { Icon } from "../../../components/shared/icon";
 import { formatCurrency } from '../../../lib/utils';
 import { 
   ResponsiveContainer, 

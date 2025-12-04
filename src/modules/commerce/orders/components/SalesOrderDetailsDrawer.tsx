@@ -12,7 +12,7 @@ import { Button } from "../../../../components/ui/Button";
 import { Badge } from "../../../../components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle as CardTitleUI } from "../../../../components/ui/Card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../../components/ui/Table";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { StatusBadge } from "../../../../components/ui/StatusBadge";
 import { formatCurrency } from "../../../../lib/utils";
 import type { SalesOrder } from "../../../../types";

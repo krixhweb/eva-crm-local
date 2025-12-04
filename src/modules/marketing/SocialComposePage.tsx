@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import { Icon } from '../../components/shared/Icon';
+import { Icon } from '../../components/shared/icon';
 import { Composer } from './social/components/Composer';
 
 const SocialComposePage: React.FC = () => {

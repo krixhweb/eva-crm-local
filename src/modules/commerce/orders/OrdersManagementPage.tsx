@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "../../../components/ui/Button";
 import { Card, CardContent } from "../../../components/ui/Card";
-import { Icon } from "../../../components/shared/Icon";
+import { Icon } from "../../../components/shared/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/Tabs";
 import { useGlassyToasts } from "../../../components/ui/GlassyToastProvider";
 

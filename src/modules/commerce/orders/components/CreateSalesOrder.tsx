@@ -7,7 +7,7 @@ import { Textarea } from '../../../../components/ui/Textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/Card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/Select';
 import { DatePicker } from '../../../../components/ui/DatePicker';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Switch } from '../../../../components/ui/Switch';
 import { formatCurrency, cn } from '../../../../lib/utils';
 import { mockCustomers } from '../../../../data/mockData';

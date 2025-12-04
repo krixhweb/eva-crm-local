@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { Icon } from '../../components/shared/Icon';
+import { Icon } from '../../components/shared/icon';
 import { Tabs, TabsList, TabsTrigger } from '../../components/ui/Tabs';
 
 const navItems = [

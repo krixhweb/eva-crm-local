@@ -1,18 +1,21 @@
+// Glassy Toast — macOS/iOS-style blur notifications with timer + animations
 
-import React, { 
-  createContext, 
-  useContext, 
-  useState, 
-  useCallback, 
-  useEffect, 
-  ReactNode 
-} from 'react';
-import { createPortal } from 'react-dom';
-import { cn } from '../../lib/utils';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
+import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { cn } from "../../lib/utils";
 
-// --- Types ---
+/* -----------------------------------
+      Types
+----------------------------------- */
 
-export type ToastVariant = 'default' | 'success' | 'error' | 'info';
+export type ToastVariant = "default" | "success" | "error" | "info";
 
 export interface ToastOptions {
   title?: string;
@@ -25,88 +28,101 @@ export interface Toast extends ToastOptions {
   id: string;
 }
 
-interface GlassyToastContextType {
-  push: (options: ToastOptions) => void;
-  remove: (id: string) => void;
+/* -----------------------------------
+      Context
+----------------------------------- */
+
+interface ToastCtx {
+  push: (t: ToastOptions) => void; // add toast
+  remove: (id: string) => void;    // remove toast
 }
 
-// --- Context ---
+const ToastContext = createContext<ToastCtx | undefined>(undefined);
 
-const ToastContext = createContext<GlassyToastContextType | undefined>(undefined);
-
-// --- Icons ---
+/* -----------------------------------
+      Icons
+----------------------------------- */
 
 const Icons = {
   success: (
-    <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <svg className="w-5 h-5 text-emerald-500" viewBox="0 0 24 24" fill="none">
+      <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
     </svg>
   ),
   error: (
-    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <svg className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none">
+      <path d="M12 8v4m0 4h.01" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
     </svg>
   ),
   info: (
-    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none">
+      <path d="M13 16h-1v-4h-1m1-4h.01" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
     </svg>
   ),
   default: (
-    <svg className="w-5 h-5 text-gray-500 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    <svg className="w-5 h-5 text-gray-500 dark:text-gray-300" viewBox="0 0 24 24" fill="none">
+      <path d="M15 17h5l-1.4-1.4A2 2 0 0118 14v-3a6 6 0 00-4-6V5a2 2 0 10-4 0v.3A6 6 0 006 11v3c0 .5-.2 1-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1"
+        stroke="currentColor" strokeWidth="2" />
     </svg>
   ),
   close: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+      <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2" />
     </svg>
-  ),
+  )
 };
 
-// --- Components ---
+/* -----------------------------------
+      Progress Bar (auto-dismiss)
+----------------------------------- */
 
-const ProgressBar: React.FC<{ 
-  duration: number; 
-  isPaused: boolean; 
+const ProgressBar: React.FC<{
+  duration: number;
+  isPaused: boolean;
   onComplete: () => void;
   variant: ToastVariant;
-}> = ({ 
-  duration, 
-  isPaused, 
-  onComplete,
-  variant 
-}) => {
+}> = ({ duration, isPaused, onComplete, variant }) => {
   const [start, setStart] = useState(false);
 
+  // Slight delay so animation triggers properly
   useEffect(() => {
-    const timer = setTimeout(() => setStart(true), 50);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setStart(true), 50);
+    return () => clearTimeout(t);
   }, []);
 
+  // Color theme for variant
   const getGradient = () => {
     switch (variant) {
-      case 'success': return 'bg-gradient-to-r from-emerald-400 to-emerald-600';
-      case 'error': return 'bg-gradient-to-r from-red-400 to-red-600';
-      case 'info': return 'bg-gradient-to-r from-blue-400 to-blue-600';
-      default: return 'bg-gradient-to-r from-gray-400 to-gray-600';
+      case "success":
+        return "bg-gradient-to-r from-emerald-400 to-emerald-600";
+      case "error":
+        return "bg-gradient-to-r from-red-400 to-red-600";
+      case "info":
+        return "bg-gradient-to-r from-blue-400 to-blue-600";
+      default:
+        return "bg-gradient-to-r from-gray-400 to-gray-600";
     }
   };
 
   return (
-    <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100/20 dark:bg-gray-800/20 rounded-b-lg overflow-hidden">
+    <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-100/20 dark:bg-gray-800/20 overflow-hidden">
       <div
         className={cn("h-full", getGradient())}
         style={{
-          width: '100%',
-          animationName: 'glassy-shrink',
+          width: "100%",
+          animationName: "glassy-shrink",
           animationDuration: `${duration}ms`,
-          animationTimingFunction: 'linear',
-          animationFillMode: 'for',
-          animationPlayState: isPaused || !start ? 'paused' : 'running',
+          animationTimingFunction: "linear",
+          animationFillMode: "forwards",
+          animationPlayState: isPaused || !start ? "paused" : "running"
         }}
         onAnimationEnd={onComplete}
       />
+
+      {/* Keyframes for shrink animation */}
       <style>{`
         @keyframes glassy-shrink {
           from { width: 100%; }
@@ -117,116 +133,108 @@ const ProgressBar: React.FC<{
   );
 };
 
-const GlassyToast: React.FC<{ 
-  data: Toast; 
-  onRemove: (id: string) => void;
-}> = ({ 
-  data, 
-  onRemove 
+/* -----------------------------------
+      Single Toast UI
+----------------------------------- */
+
+const GlassyToast: React.FC<{ data: Toast; onRemove: (id: string) => void }> = ({
+  data,
+  onRemove
 }) => {
   const [isExiting, setIsExiting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
   const duration = data.duration || 4000;
 
+  // Remove toast with exit animation
   const handleDismiss = useCallback(() => {
     setIsExiting(true);
-    setTimeout(() => {
-      onRemove(data.id);
-    }, 300);
+    setTimeout(() => onRemove(data.id), 300);
   }, [data.id, onRemove]);
 
+  // Small delay to play entry animation
   useEffect(() => {
-    // Trigger enter animation next frame
-    requestAnimationFrame(() => {
-      setIsMounted(true);
-    });
+    requestAnimationFrame(() => setMounted(true));
   }, []);
 
   return (
     <div
       className={cn(
         "relative w-80 pointer-events-auto",
-        "bg-white/80 dark:bg-neutral-900/80",
-        "backdrop-blur-xl",
+        "bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl",
         "border border-white/40 dark:border-white/10",
-        "shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]",
-        "rounded-2xl overflow-hidden",
-        "transition-all duration-300 ease-out"
+        "shadow-[0_8px_32px_rgba(31,38,135,0.15)]",
+        "rounded-2xl overflow-hidden transition-all duration-300"
       )}
       style={{
-        opacity: isMounted && !isExiting ? 1 : 0,
-        transform: isMounted && !isExiting 
-          ? 'translate(0, 0)' 
-          : 'translate(10px, -10px)'
+        opacity: mounted && !isExiting ? 1 : 0,
+        transform: mounted && !isExiting ? "translate(0,0)" : "translate(10px,-10px)"
       }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       role="alert"
     >
       <div className="flex items-start p-4 gap-3">
-        <div className="flex-shrink-0 mt-0.5">
-          {Icons[data.variant || 'default']}
-        </div>
+        <div className="flex-shrink-0 mt-0.5">{Icons[data.variant || "default"]}</div>
 
-        <div className="flex-1 w-0">
+        <div className="flex-1">
           {data.title && (
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white leading-5">
-              {data.title}
-            </h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{data.title}</h3>
           )}
           {data.description && (
-            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 leading-5">
-              {data.description}
-            </p>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{data.description}</p>
           )}
         </div>
 
         <button
           onClick={handleDismiss}
-          className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors focus:outline-none"
-          aria-label="Close notification"
+          className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
         >
           {Icons.close}
         </button>
       </div>
 
-      <ProgressBar 
-        duration={duration} 
-        isPaused={isPaused} 
-        onComplete={handleDismiss} 
-        variant={data.variant || 'default'}
+      <ProgressBar
+        duration={duration}
+        isPaused={isPaused}
+        onComplete={handleDismiss}
+        variant={data.variant || "default"}
       />
     </div>
   );
 };
 
-const GlassyToastContainer: React.FC<{ toasts: Toast[], onRemove: (id: string) => void }> = ({ toasts, onRemove }) => {
-  if (typeof document === 'undefined') return null;
+/* -----------------------------------
+      Toast Container (portal)
+----------------------------------- */
+
+const GlassyToastContainer: React.FC<{
+  toasts: Toast[];
+  onRemove: (id: string) => void;
+}> = ({ toasts, onRemove }) => {
+  if (typeof document === "undefined") return null;
 
   return createPortal(
-    <div 
-      aria-live="polite"
-      className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
-    >
-      {toasts.map((toast) => (
-        <GlassyToast key={toast.id} data={toast} onRemove={onRemove} />
+    <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none">
+      {toasts.map((t) => (
+        <GlassyToast key={t.id} data={t} onRemove={onRemove} />
       ))}
     </div>,
     document.body
   );
 };
 
-// --- Provider ---
+/* -----------------------------------
+      Provider
+----------------------------------- */
 
 export const GlassyToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const push = useCallback((options: ToastOptions) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    const newToast: Toast = { ...options, id };
-    // Add to beginning of array to stack newest on top visually
-    setToasts((prev) => [newToast, ...prev]);
+  const push = useCallback((opts: ToastOptions) => {
+    const id = Math.random().toString(36).slice(2, 9);
+    setToasts((prev) => [{ ...opts, id }, ...prev]); // newest at top
   }, []);
 
   const remove = useCallback((id: string) => {
@@ -241,12 +249,12 @@ export const GlassyToastProvider: React.FC<{ children: ReactNode }> = ({ childre
   );
 };
 
-// --- Hook ---
+/* -----------------------------------
+      Hook
+----------------------------------- */
 
 export const useGlassyToasts = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useGlassyToasts must be used within a GlassyToastProvider');
-  }
-  return context;
+  const ctx = useContext(ToastContext);
+  if (!ctx) throw new Error("useGlassyToasts must be used within GlassyToastProvider");
+  return ctx;
 };

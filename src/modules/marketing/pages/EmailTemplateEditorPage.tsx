@@ -16,7 +16,7 @@ import {
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 import { useGlassyToasts } from '../../../components/ui/GlassyToastProvider';
 import type { EmailTemplate } from '../../../types';
 import { TemplateStore } from '../../../data/emailMockData';

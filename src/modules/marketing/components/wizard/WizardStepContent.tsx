@@ -5,7 +5,7 @@ import { Input } from '../../../../components/ui/Input';
 import { Label } from '../../../../components/ui/Label';
 import { Button } from '../../../../components/ui/Button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/Select';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Badge } from '../../../../components/ui/Badge';
 import { DatePicker } from '../../../../components/ui/DatePicker';
 import { Switch } from '../../../../components/ui/Switch';

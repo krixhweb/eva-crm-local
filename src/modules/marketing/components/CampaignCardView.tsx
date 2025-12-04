@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "../../../components/ui/Card";
 import { Badge } from "../../../components/ui/Badge";
 import { Button } from "../../../components/ui/Button";
-import { Icon } from "../../../components/shared/Icon";
+import { Icon } from "../../../components/shared/icon";
 import { formatCurrency } from '../../../lib/utils';
 import type { Campaign } from '../../../types';
 

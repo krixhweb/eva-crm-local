@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { cn } from '../../lib/utils';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion } from 'framer-motion';
+import type { HTMLMotionProps } from 'framer-motion';
 
+// Context to share selected tab + handler across components
 const TabsContext = React.createContext<{
   value: string;
   onValueChange: (value: string) => void;
@@ -24,21 +26,16 @@ const Tabs: React.FC<TabsProps> = ({ defaultValue, value, onValueChange, childre
   const [internalValue, setInternalValue] = React.useState(defaultValue || '');
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : internalValue;
-  const groupId = React.useId();
+  const groupId = React.useId(); // used for shared framer-motion id
 
   const handleValueChange = (newValue: string) => {
     if (!isControlled) setInternalValue(newValue);
-    onValueChange?.(newValue);
+    onValueChange?.(newValue); // notify parent
   };
 
   return (
     <TabsContext.Provider value={{ value: currentValue || '', onValueChange: handleValueChange, groupId }}>
-      <div className={cn(
-        'transition-shadow',
-        'hover:shadow-md',                // shadow on hover
-        'shadow-sm',                      // softer normal shadow
-        className
-      )}>
+      <div className={cn('transition-shadow hover:shadow-md shadow-sm', className)}>
         {children}
       </div>
     </TabsContext.Provider>
@@ -50,9 +47,8 @@ const TabsList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
     <div
       ref={ref}
       className={cn(
-        // tab bar container
+        // tabs container surface
         'inline-flex items-center h-11 rounded-full bg-white/60 dark:bg-white/10 backdrop-blur-xl px-2 py-1 gap-2 border border-white/40 overflow-hidden select-none',
-        // 👇 shadow behavior for the whole control
         'transition-shadow shadow-sm hover:shadow-md',
         className
       )}
@@ -60,7 +56,6 @@ const TabsList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
     />
   )
 );
-
 TabsList.displayName = 'TabsList';
 
 const TabsTrigger = React.forwardRef<
@@ -68,13 +63,13 @@ const TabsTrigger = React.forwardRef<
   React.ButtonHTMLAttributes<HTMLButtonElement> & { value: string }
 >(({ className, value: triggerValue, children, ...props }, ref) => {
   const { value, onValueChange, groupId } = React.useContext(TabsContext);
-  const isActive = value === triggerValue;
+  const isActive = value === triggerValue; // active tab check
 
   return (
     <button
       ref={ref}
       type="button"
-      onClick={() => onValueChange(triggerValue)}
+      onClick={() => onValueChange(triggerValue)} // select tab
       className={cn(
         'relative inline-flex items-center justify-center whitespace-nowrap rounded-full transition-all font-medium text-sm px-4 py-1.5',
         isActive
@@ -86,12 +81,11 @@ const TabsTrigger = React.forwardRef<
       {...props}
     >
       {isActive && (
-       <motion.div
-        layoutId={`${groupId}-activeTab`}
-         className="absolute inset-0 bg-white rounded-full border border-green-500/60 shadow-[0_2px_12px_rgba(0,0,0,0.12)]"
-         transition={{ type: 'spring', bounce: 0.35, duration: 0.48 }}
-    />
-
+        <motion.div
+          layoutId={`${groupId}-activeTab`} // shared motion id for sliding background
+          className="absolute inset-0 bg-white rounded-full border border-green-500/60 shadow-[0_2px_12px_rgba(0,0,0,0.12)]"
+          transition={{ type: 'spring', bounce: 0.35, duration: 0.48 }}
+        />
       )}
       <span className="relative z-10 flex items-center gap-1">{children}</span>
     </button>
@@ -104,12 +98,12 @@ const TabsContent = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement> & { value: string }
 >(({ value: tabValue, className, children, ...props }, ref) => {
   const { value: contextValue } = React.useContext(TabsContext);
-  if (contextValue !== tabValue) return null;
+  if (contextValue !== tabValue) return null; // only show active tab panel
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 6 }}
+      initial={{ opacity: 0, y: 6 }} // fade+slide on mount
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.27, ease: 'easeOut' }}
       className={cn('mt-4', className)}

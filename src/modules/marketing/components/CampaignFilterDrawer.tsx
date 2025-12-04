@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { DatePicker } from '../../../components/ui/DatePicker';
 import { mockTeamMembers } from '../../../data/mockData';
 import MultiSelect from '../../../components/ui/MultiSelect';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 
 export interface CampaignFiltersState {
   status: string[];

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter, DrawerDescription } from '../../../../components/ui/Drawer';
 import { Button } from '../../../../components/ui/Button';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import type { EmailTemplate } from '../../../../types';
 import { cn } from '../../../../lib/utils';
 

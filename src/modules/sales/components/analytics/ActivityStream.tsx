@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/Card";
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../../components/ui/Tabs';
 import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';

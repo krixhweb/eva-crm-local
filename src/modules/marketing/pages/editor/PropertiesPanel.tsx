@@ -6,7 +6,7 @@ import { Label } from "../../../../components/ui/Label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/Select";
 import { Textarea } from "../../../../components/ui/Textarea";
 import { Switch } from "../../../../components/ui/Switch";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/Tabs";
 import { cn } from "../../../../lib/utils";
 import type { Block, SocialNetwork, ColumnData } from "./editorTypes";

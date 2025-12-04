@@ -4,7 +4,7 @@ import { SocialAccount, SocialAttachment, LinkMetadata, Platform, PLATFORM_CONFI
 import { SocialService } from '../api/mockService';
 import { PostPreview } from './PostPreview';
 import { Button } from '../../../../components/ui/Button';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Textarea } from '../../../../components/ui/Textarea';
 import { Input } from '../../../../components/ui/Input';
 import { Label } from '../../../../components/ui/Label';

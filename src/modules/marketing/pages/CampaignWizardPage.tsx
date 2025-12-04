@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../../../components/ui/Button';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 import { useGlassyToasts } from '../../../components/ui/GlassyToastProvider';
 import { 
   WizardStep1Setup, 

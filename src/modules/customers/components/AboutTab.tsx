@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import type { Customer, Note } from '../../../types';
 import { Card } from '../../../components/ui/Card';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import type { RootState } from '../../../store/store';

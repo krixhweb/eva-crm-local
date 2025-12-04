@@ -1,49 +1,54 @@
-
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toggleDarkMode } from '../../store/uiSlice';
-import type { RootState } from '../../store/store';
-import { Icon } from '../shared/Icon';
-import { Button } from './Button';
+import React, { useEffect, useState } from 'react';
 import { cn } from '../../lib/utils';
 
-interface ThemeToggleProps {
-  className?: string;
-}
+/**
+ * ThemeToggle
+ * - Toggles the `dark` class on `document.documentElement`
+ * - Persists the user's preference in `localStorage` under `theme`
+ * - Exports a named `ThemeToggle` component (TopNavBar imports this)
+ */
+export const ThemeToggle: React.FC = () => {
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    try {
+      const stored = localStorage.getItem('theme');
+      if (stored) return stored === 'dark';
+      return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return false;
+    }
+  });
 
-export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className }) => {
-  const isDarkMode = useSelector((state: RootState) => state.ui.isDarkMode);
-  const dispatch = useDispatch();
+  useEffect(() => {
+    try {
+      document.documentElement.classList.toggle('dark', isDark);
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    } catch {
+      // ignore storage errors in restricted environments
+    }
+  }, [isDark]);
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => dispatch(toggleDarkMode())}
+    <button
+      onClick={() => setIsDark((v) => !v)}
+      aria-label="Toggle theme"
+      title={isDark ? 'Switch to light' : 'Switch to dark'}
       className={cn(
-        "rounded-full w-10 h-10 transition-all duration-300 ease-in-out",
-        "hover:bg-gray-100 dark:hover:bg-white/10",
-        "text-gray-500 dark:text-gray-400",
-        className
+        'w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition',
       )}
-      title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
     >
-      <div className="relative w-5 h-5">
-        <Icon 
-          name="sun" 
-          className={cn(
-            "absolute inset-0 w-5 h-5 transition-all duration-300 transform",
-            isDarkMode ? "opacity-100 rotate-0" : "opacity-0 -rotate-90 scale-50"
-          )} 
-        />
-        <Icon 
-          name="moon" 
-          className={cn(
-            "absolute inset-0 w-5 h-5 transition-all duration-300 transform",
-            !isDarkMode ? "opacity-100 rotate-0" : "opacity-0 rotate-90 scale-50"
-          )} 
-        />
-      </div>
-    </Button>
+      {isDark ? (
+        // Sun icon (light mode)
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-yellow-500">
+          <path d="M12 4.5a.75.75 0 01.75-.75h0a.75.75 0 010 1.5H12.75A.75.75 0 0112 4.5zM12 19.5a.75.75 0 01.75-.75h0a.75.75 0 010 1.5H12.75A.75.75 0 0112 19.5zM4.5 12a.75.75 0 01-.75-.75h0a.75.75 0 011.5 0V11.25A.75.75 0 014.5 12zM19.5 12a.75.75 0 01-.75-.75h0a.75.75 0 011.5 0V11.25A.75.75 0 0119.5 12zM6.72 6.72a.75.75 0 010-1.06h0a.75.75 0 011.06 0l.53.53a.75.75 0 11-1.06 1.06l-.53-.53zM16.69 16.69a.75.75 0 010-1.06h0a.75.75 0 011.06 0l.53.53a.75.75 0 11-1.06 1.06l-.53-.53zM6.72 17.28a.75.75 0 011.06 0h0a.75.75 0 010 1.06l-.53.53a.75.75 0 11-1.06-1.06l.53-.53zM16.69 7.31a.75.75 0 011.06 0h0a.75.75 0 010 1.06l-.53.53a.75.75 0 11-1.06-1.06l.53-.53zM12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z" />
+        </svg>
+      ) : (
+        // Moon icon (dark mode)
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-700 dark:text-gray-200">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+        </svg>
+      )}
+    </button>
   );
 };
+
+export default ThemeToggle;

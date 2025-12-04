@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Platform, SocialAttachment, LinkMetadata } from '../types';
 import { cn } from '../../../../lib/utils';
 

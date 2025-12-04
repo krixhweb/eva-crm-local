@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useCallback, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader } from "../../../../components/ui/Card";
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
 import { Label } from '../../../../components/ui/Label';

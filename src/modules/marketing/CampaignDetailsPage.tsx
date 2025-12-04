@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import { Icon } from '../../components/shared/Icon';
+import { Icon } from '../../components/shared/icon';
 import { mockCampaigns } from '../../data/mockData';
 import type { Campaign } from '../../types';
 import { CampaignOverview } from './components/campaignDetails/CampaignOverview';

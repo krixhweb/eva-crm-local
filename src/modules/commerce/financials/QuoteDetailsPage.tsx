@@ -1,10 +1,9 @@
 
-import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/Table';
 import { formatCurrency } from '../../../lib/utils';
 import { mockQuotes } from '../../../data/financialsMockData';
@@ -58,7 +57,7 @@ const QuoteDetailsPage = () => {
                                         <TableHead>Quantity</TableHead>
                                         <TableHead>Unit Price</TableHead>
                                         <TableHead className="text-right">Total</TableHead>
-                                    TableRow>
+                                    </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {quote.lineItems.map(item => (

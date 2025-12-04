@@ -1,3 +1,4 @@
+/* Layout.tsx — Global layout wrapper: sidebar, top navbar, and page content */
 
 import React from 'react';
 import Sidebar from './Sidebar';
@@ -5,30 +6,45 @@ import TopNavBar from './TopNavBar';
 import { motion } from 'framer-motion';
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children: React.ReactNode; // rendered page
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="flex h-screen bg-white dark:bg-[#09090b] text-gray-800 dark:text-dark-text transition-colors duration-300 overflow-hidden">
-      <Sidebar />
+    <div className="flex h-screen bg-white dark:bg-[#09090b] text-gray-800 dark:text-dark-text overflow-hidden">
       
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative transition-all duration-300 min-w-0">
+      {/* --- Sidebar Section --- */}
+      <Sidebar />
+
+      {/* --- Main Panel --- */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+        
+        {/* --- Top Navigation Bar --- */}
         <TopNavBar />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-black p-4 sm:p-6 transition-all duration-300 rounded-tl-3xl border-t border-l border-green-500 dark:border-green-500/30">
+
+        {/* --- Page Content Area --- */}
+        <main
+          className="
+            flex-1 overflow-y-auto overflow-x-hidden
+            bg-gray-50 dark:bg-black
+            p-4 sm:p-6
+            rounded-tl-3xl
+            border-t border-l border-green-500 dark:border-green-500/30
+            transition-all duration-300
+          "
+        >
+          {/* --- Content Wrapper + Page Animation --- */}
           <div className="max-w-[1600px] mx-auto h-full">
             <motion.div
-                {...({
-                    initial: { opacity: 0, y: 15 },
-                    animate: { opacity: 1, y: 0 },
-                    transition: { duration: 0.4, ease: "easeOut" }
-                } as any)}
-                className="h-full"
+              initial={{ opacity: 0, y: 15 }}  // page enter animation
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="h-full"
             >
-                {children}
+              {children}
             </motion.div>
           </div>
+          
         </main>
       </div>
     </div>

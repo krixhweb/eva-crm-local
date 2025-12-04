@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card } from '../../../components/ui/Card';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 import { mockCommunications } from '../../../data/mockData';
 
 const CommunicationsTab: React.FC = () => {

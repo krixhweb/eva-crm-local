@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Badge } from "../../../components/ui/Badge";
 import { Checkbox } from "../../../components/ui/Checkbox";
 import { Button } from "../../../components/ui/Button";
-import { Icon } from "../../../components/shared/Icon";
+import { Icon } from "../../../components/shared/icon";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../../components/ui/DropdownMenu';
 import { formatCurrency } from '../../../lib/utils';
 import type { Campaign } from '../../../types';

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card } from '../../../components/ui/Card';
-import { Icon } from '../../../components/shared/Icon';
+import { Icon } from '../../../components/shared/icon';
 import type { Activity, ActivityDetailsCart, ActivityDetailsEmail, ActivityDetailsLogin, ActivityDetailsOrder, ActivityDetailsPageView, ActivityDetailsProfile, ActivityDetailsTicket } from '../../../types';
 import ActivityPreviewModal from '../../../components/modals/ActivityPreviewModal';
 import { mockActivities } from '../../../data/mockData';

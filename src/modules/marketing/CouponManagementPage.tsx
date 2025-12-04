@@ -7,7 +7,7 @@ import { Badge } from "../../components/ui/Badge";
 import { Progress } from "../../components/ui/Progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/Table";
 import { Input } from "../../components/ui/Input";
-import { Icon } from "../../components/shared/Icon";
+import { Icon } from "../../components/shared/icon";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../components/ui/DropdownMenu";
 import { formatCurrency } from "../../lib/utils";
 import { mockCoupons } from "../../data/mockData";

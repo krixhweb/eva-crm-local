@@ -2,7 +2,7 @@
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { cn } from '../../../../lib/utils';
-import { Icon } from '../../../../components/shared/Icon';
+import { Icon } from '../../../../components/shared/icon';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../../components/ui/Tabs';
 import type { BlockType } from './editorTypes';
 import { EMAIL_PRESETS, EmailPreset } from './emailPresets';

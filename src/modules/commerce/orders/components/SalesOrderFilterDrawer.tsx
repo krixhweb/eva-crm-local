@@ -11,7 +11,7 @@ import {
 import { Button } from "../../../../components/ui/Button";
 import { Label } from "../../../../components/ui/Label";
 import { Input } from "../../../../components/ui/Input";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { Badge } from "../../../../components/ui/Badge";
 import { DatePicker } from "../../../../components/ui/DatePicker";
 import type { DateRange } from "../../../../components/ui/Calendar";

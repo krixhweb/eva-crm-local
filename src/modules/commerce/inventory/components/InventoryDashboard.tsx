@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/Card";
 import { Button } from "../../../../components/ui/Button";
 import { Input } from "../../../../components/ui/Input";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { Badge } from "../../../../components/ui/Badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/Tabs";
 import { Progress } from "../../../../components/ui/Progress";

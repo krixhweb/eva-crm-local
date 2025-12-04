@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Icon } from '../../components/shared/Icon';
+import { Icon } from '../../components/shared/icon';
 import type { Customer } from '../../types';
 import EditCustomerModal from '../../components/modals/EditCustomerModal';
 import { Badge } from '../../components/ui/Badge';
