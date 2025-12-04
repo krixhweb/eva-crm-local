@@ -245,15 +245,28 @@ export default function CreateSalesOrder({ onClose, onSave, initialData }: Creat
   };
 
   const selectProduct = (id: string, product: Product) => {
-    const taxRate = 18; 
-    setLineItems(prev => prev.map(item => {
+    const taxRate = 18;
+    // Prefer top-level sellingPrice, then pricing.sellingPrice, fallback to 0
+    const unitPrice = product.sellingPrice ?? product.pricing?.sellingPrice ?? 0;
+
+    setLineItems((prev) =>
+      prev.map((item) => {
         if (item.id === id) {
-            return {
-                ...item, productId: product.id, name: product.name, sku: product.sku, image: product.images[0], price: product.sellingPrice, quantity: 1, taxRate: taxRate, total: calculateRowTotal(product.sellingPrice, 1, taxRate)
-            };
+          return {
+            ...item,
+            productId: product.id,
+            name: product.name,
+            sku: product.sku,
+            image: product.images[0],
+            price: unitPrice,
+            quantity: 1,
+            taxRate,
+            total: calculateRowTotal(unitPrice, 1, taxRate),
+          };
         }
         return item;
-    }));
+      }),
+    );
     setProductSearchOpen(null);
   };
 
@@ -536,6 +549,20 @@ export default function CreateSalesOrder({ onClose, onSave, initialData }: Creat
                         </div>
 
                         <div className="border-t border-gray-200 dark:border-zinc-700 pt-3 mt-2">
-                            <div className="flex justify-between items-end">
-                                <span className="text-base font-bold text-gray-900 dark:text-gray-100">Grand Total</span>
-                                <span className="text-xl font-extrab
+                          <div className="flex justify-between items-end">
+                            <span className="text-base font-bold text-gray-900 dark:text-gray-100">
+                              Grand Total
+                            </span>
+                            <span className="text-xl font-extrabold text-gray-900 dark:text-gray-100">
+                              {formatCurrency(totals.grandTotal)}
+                            </span>
+                          </div>
+                        </div>
+                    </CardContent>
+                 </Card>
+            </div>
+        </div>
+      </div>
+    </div>
+  );
+}

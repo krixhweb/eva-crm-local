@@ -13,7 +13,8 @@ import ShippingFulfillmentTab from './components/ShippingFulfillmentTab';
 
 import CreateSalesOrderModal from "../../../components/modals/CreateSalesOrderModal";
 import CreatePurchaseOrderModal from "../../../components/modals/CreatePurchaseOrderModal";
-import CreateReplenishmentOrderDrawer, { ReplenishmentOrderPayload } from "../../../components/modals/CreateReplenishmentOrderDrawer";
+import CreateReplenishmentOrderDrawer from "../../../components/modals/CreateReplenishmentOrderDrawer";
+import type { ReplenishmentOrderPayload } from "../../../components/modals/CreateReplenishmentOrderDrawer";
 
 import { mockSalesOrders, mockPurchaseOrders, mockSupplierReturns, mockShipping } from "../../../data/ordersMockData";
 import type { SalesOrder, PurchaseOrder, SupplierReturn, ShippingInfo } from "../../../types";

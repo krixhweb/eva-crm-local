@@ -168,7 +168,10 @@ const CreateReplenishmentOrderDrawer: React.FC<CreateReplenishmentOrderDrawerPro
 
   const stockStatus = useMemo(() => {
     if (!selectedProduct) return { text: 'Unknown', variant: 'gray' };
-    return getStockStatus(selectedProduct.totalStock, selectedProduct.stockRules?.lowStockThreshold || 10);
+    return getStockStatus(
+      selectedProduct.totalStock,
+      selectedProduct.stockRules?.lowStockThreshold || 10,
+    );
   }, [selectedProduct]);
 
   // --- Effects ---
@@ -331,7 +334,9 @@ const CreateReplenishmentOrderDrawer: React.FC<CreateReplenishmentOrderDrawerPro
     );
   }, [searchQuery]);
 
-  const storefrontOptions = productLocations.filter(l => l.id.includes('loc_3')).map(l => l.name); // Mock logic for storefronts
+  const storefrontOptions = productLocations
+    .filter((l) => l.id.includes('loc_3'))
+    .map((l) => l.name); // Mock logic for storefronts
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -363,378 +368,83 @@ const CreateReplenishmentOrderDrawer: React.FC<CreateReplenishmentOrderDrawerPro
 
         {/* BODY */}
         <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-gray-50/50 dark:bg-zinc-950/50 scroll-smooth">
-            
-            {/* 1. PRODUCT INFO */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-4">
-                    <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
-                        <Icon name="package" className="w-4 h-4" /> Product Information
-                    </h3>
-                    
-                    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-1 shadow-sm">
-                         {mode === 'restock' ? (
-                            <div className="p-4 flex items-start gap-4">
-                                <div className="h-16 w-16 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center shrink-0 border dark:border-zinc-700">
-                                    {selectedProduct?.images?.[0] ? (
-                                        <img src={selectedProduct.images[0]} alt="" className="h-full w-full object-cover rounded-lg" />
-                                    ) : (
-                                        <Icon name="image" className="w-8 h-8 text-gray-400" />
-                                    )}
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="font-bold text-gray-900 dark:text-gray-100 text-lg">{selectedProduct?.name}</h4>
-                                    <div className="flex gap-4 mt-1 text-sm text-gray-500">
-                                        <span>SKU: <span className="font-mono text-gray-700 dark:text-gray-300">{selectedProduct?.sku}</span></span>
-                                        <span>Brand: {selectedProduct?.brand}</span>
-                                        <span>Category: {selectedProduct?.category}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="p-4">
-                                <Label className={cn("mb-1.5 block", errors.product && "text-red-500")}>Search Product *</Label>
-                                <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
-                                    <PopoverTrigger asChild>
-                                        <div className="relative">
-                                            <Input 
-                                                placeholder="Type name, SKU or brand..." 
-                                                value={searchQuery}
-                                                onChange={(e) => { setSearchQuery(e.target.value); setIsSearchOpen(true); }}
-                                                onFocus={() => setIsSearchOpen(true)}
-                                                className={cn("pl-10", errors.product && "border-red-500 focus-visible:ring-red-500")}
-                                            />
-                                            <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                                        </div>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 max-h-[300px] overflow-y-auto" align="start">
-                                        {filteredProducts.length > 0 ? (
-                                            filteredProducts.map((p) => (
-                                                <div key={p.id} onClick={() => handleProductSelect(p)} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer flex justify-between items-center border-b last:border-0 dark:border-zinc-800">
-                                                    <div>
-                                                        <p className="font-medium text-sm">{p.name}</p>
-                                                        <p className="text-xs text-gray-500 font-mono">{p.sku}</p>
-                                                    </div>
-                                                    <Badge variant={p.totalStock === 0 ? 'red' : 'green'} className="text-[10px] h-5">{p.totalStock} in stock</Badge>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="p-4 text-center text-gray-500 text-sm">No products found</div>
-                                        )}
-                                    </PopoverContent>
-                                </Popover>
-                                {errors.product && <p className="text-xs text-red-500 mt-1">{errors.product}</p>}
-                            </div>
-                        )}
+          <ProductInfoSection
+            mode={mode}
+            selectedProduct={selectedProduct}
+            stockStatus={stockStatus}
+            avgDailySales={avgDailySales}
+            recommendedQty={recommendedQty}
+            errors={errors}
+            isSearchOpen={isSearchOpen}
+            searchQuery={searchQuery}
+            setIsSearchOpen={setIsSearchOpen}
+            setSearchQuery={setSearchQuery}
+            filteredProducts={filteredProducts}
+            onSelectProduct={handleProductSelect}
+          />
 
-                        {selectedProduct && (
-                            <div className="grid grid-cols-4 gap-px bg-gray-100 dark:bg-zinc-800 border-t dark:border-zinc-800">
-                                <div className="bg-white dark:bg-zinc-900 p-4">
-                                    <p className="text-xs text-gray-500 uppercase mb-1">Current Stock</p>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xl font-bold">{selectedProduct.totalStock}</span>
-                                        <Badge variant={stockStatus.variant as any} className="text-[10px] h-5 px-1.5">{stockStatus.text}</Badge>
-                                    </div>
-                                </div>
-                                <div className="bg-white dark:bg-zinc-900 p-4">
-                                    <p className="text-xs text-gray-500 uppercase mb-1">Reorder / Safety</p>
-                                    <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                                        {selectedProduct.stockRules?.reorderPoint} <span className="text-gray-400">/</span> {selectedProduct.stockRules?.safetyStock}
-                                    </span>
-                                </div>
-                                <div className="bg-white dark:bg-zinc-900 p-4">
-                                    <p className="text-xs text-gray-500 uppercase mb-1">Avg Daily Sales</p>
-                                    <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">~{avgDailySales}</span>
-                                </div>
-                                <div className="bg-white dark:bg-zinc-900 p-4">
-                                    <p className="text-xs text-gray-500 uppercase mb-1">Max Stock</p>
-                                    <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">1000</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
+          <OrderDetailsSection
+            errors={errors}
+            requestedBy={requestedBy}
+            setRequestedBy={setRequestedBy}
+            reason={reason}
+            setReason={setReason}
+            priority={priority}
+            setPriority={setPriority}
+            warehouseId={warehouseId}
+            setWarehouseId={setWarehouseId}
+            storefrontOptions={storefrontOptions}
+            storefrontIds={storefrontIds}
+            setStorefrontIds={setStorefrontIds}
+            deliveryDate={deliveryDate}
+            setDeliveryDate={setDeliveryDate}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            bufferQty={bufferQty}
+            setBufferQty={setBufferQty}
+            selectedProduct={selectedProduct}
+          />
 
-                <div className="lg:col-span-1 space-y-4">
-                     <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
-                        <Icon name="activity" className="w-4 h-4" /> Quick Stats
-                    </h3>
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900 rounded-xl p-4 space-y-3">
-                        <div className="flex justify-between items-center">
-                            <span className="text-sm text-blue-700 dark:text-blue-300">Recommended Qty</span>
-                            <span className="text-xl font-bold text-blue-700 dark:text-blue-300">{recommendedQty}</span>
-                        </div>
-                        <div className="h-px bg-blue-200 dark:bg-blue-800"></div>
-                        <div className="flex justify-between items-center text-sm">
-                             <span className="text-blue-600 dark:text-blue-400">Last Vendor</span>
-                             <span className="font-medium text-blue-800 dark:text-blue-200">{selectedProduct?.supplier?.name || 'N/A'}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                             <span className="text-blue-600 dark:text-blue-400">Last Price</span>
-                             <span className="font-medium text-blue-800 dark:text-blue-200">{formatCurrency(selectedProduct?.pricing?.cost || 0)}</span>
-                        </div>
-                         <div className="flex justify-between items-center text-sm">
-                             <span className="text-blue-600 dark:text-blue-400">Lead Time</span>
-                             <span className="font-medium text-blue-800 dark:text-blue-200">{selectedProduct?.supplier?.leadTime || '-'} Days</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+          <FinancialsAndLogisticsSection
+            errors={errors}
+            unitCost={unitCost}
+            setUnitCost={setUnitCost}
+            taxPercent={taxPercent}
+            setTaxPercent={setTaxPercent}
+            freightCost={freightCost}
+            setFreightCost={setFreightCost}
+            additionalCharges={additionalCharges}
+            setAdditionalCharges={setAdditionalCharges}
+            totalEstimatedCost={totalEstimatedCost}
+            costCenter={costCenter}
+            setCostCenter={setCostCenter}
+            paymentTerms={paymentTerms}
+            setPaymentTerms={setPaymentTerms}
+            supplierId={supplierId}
+            setSupplierId={setSupplierId}
+            shippingMethod={shippingMethod}
+            setShippingMethod={setShippingMethod}
+            insuranceRequired={insuranceRequired}
+            setInsuranceRequired={setInsuranceRequired}
+          />
 
-            {/* 2. ORDER DETAILS */}
-            <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-6">
-                <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
-                    <Icon name="fileText" className="w-4 h-4" /> Order Specification
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                         <Label className={cn(errors.requestedBy && "text-red-500")}>Requested By *</Label>
-                         <Select value={requestedBy} onValueChange={setRequestedBy}>
-                             <SelectTrigger className={cn(errors.requestedBy && "border-red-500")}><SelectValue placeholder="Select Employee" /></SelectTrigger>
-                             <SelectContent>
-                                 {mockTeamMembers.map(m => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
-                             </SelectContent>
-                         </Select>
-                         {errors.requestedBy && <p className="text-xs text-red-500">{errors.requestedBy}</p>}
-                    </div>
-                    <div className="space-y-2">
-                         <Label>Order Reason</Label>
-                         <Select value={reason} onValueChange={setReason}>
-                             <SelectTrigger><SelectValue /></SelectTrigger>
-                             <SelectContent>
-                                 {ORDER_REASONS.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                             </SelectContent>
-                         </Select>
-                    </div>
-                    <div className="space-y-2">
-                         <Label>Priority</Label>
-                         <Select value={priority} onValueChange={setPriority}>
-                             <SelectTrigger><SelectValue /></SelectTrigger>
-                             <SelectContent>
-                                 {PRIORITIES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                             </SelectContent>
-                         </Select>
-                    </div>
-                </div>
+          <ApprovalSection
+            approvalRequired={approvalRequired}
+            approvalNotes={approvalNotes}
+            setApprovalNotes={setApprovalNotes}
+            approverId={approverId}
+            setApproverId={setApproverId}
+            errors={errors}
+          />
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                        <Label className={cn(errors.warehouse && "text-red-500")}>Destination Warehouse *</Label>
-                        <Select value={warehouseId} onValueChange={setWarehouseId}>
-                            <SelectTrigger className={cn(errors.warehouse && "border-red-500")}><SelectValue placeholder="Select Warehouse" /></SelectTrigger>
-                            <SelectContent>
-                                {productLocations.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                        {errors.warehouse && <p className="text-xs text-red-500">{errors.warehouse}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Storefronts (Optional)</Label>
-                        <MultiSelect 
-                            options={storefrontOptions}
-                            value={storefrontIds}
-                            onChange={setStorefrontIds}
-                            placeholder="Select Storefronts"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label className={cn(errors.deliveryDate && "text-red-500")}>Expected Delivery *</Label>
-                        <Input type="date" value={deliveryDate} onChange={e => setDeliveryDate(e.target.value)} className={cn(errors.deliveryDate && "border-red-500")} />
-                        {errors.deliveryDate && <p className="text-xs text-red-500">{errors.deliveryDate}</p>}
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                     <div className="space-y-2">
-                        <Label className={cn(errors.quantity && "text-red-500")}>Required Qty *</Label>
-                        <Input 
-                            type="number" 
-                            value={quantity} 
-                            onChange={e => setQuantity(Number(e.target.value))} 
-                            className={cn("font-bold", errors.quantity && "border-red-500")}
-                        />
-                        {errors.quantity && <p className="text-xs text-red-500">{errors.quantity}</p>}
-                     </div>
-                     <div className="space-y-2">
-                        <Label>Buffer Qty</Label>
-                        <Input type="number" value={bufferQty} onChange={e => setBufferQty(Number(e.target.value))} placeholder="0" />
-                     </div>
-                     <div className="space-y-2">
-                         <Label>UOM</Label>
-                         <Input value={selectedProduct?.unitOfMeasurement || 'Piece'} disabled className="bg-gray-50 dark:bg-zinc-800 text-gray-500" />
-                     </div>
-                     <div className="space-y-2">
-                         <Label>MOQ</Label>
-                         <Input value={selectedProduct?.supplier?.supplierMOQ || 1} disabled className="bg-gray-50 dark:bg-zinc-800 text-gray-500" />
-                     </div>
-                </div>
-            </section>
-
-            {/* 3. FINANCIALS & LOGISTICS */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Financials */}
-                <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
-                     <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
-                        <Icon name="dollarSign" className="w-4 h-4" /> Financial Details
-                    </h3>
-                    
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <Label>Unit Cost</Label>
-                            <Input type="number" value={unitCost} onChange={e => setUnitCost(Number(e.target.value))} className="w-32 text-right" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <Label>Tax %</Label>
-                            <Input type="number" value={taxPercent} onChange={e => setTaxPercent(Number(e.target.value))} className="w-32 text-right" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <Label>Freight / Shipping</Label>
-                            <Input type="number" value={freightCost} onChange={e => setFreightCost(Number(e.target.value))} className="w-32 text-right" />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <Label>Additional Charges</Label>
-                            <Input type="number" value={additionalCharges} onChange={e => setAdditionalCharges(Number(e.target.value))} className="w-32 text-right" />
-                        </div>
-                        
-                        <div className="border-t dark:border-zinc-800 pt-3 flex items-center justify-between">
-                            <span className="font-bold text-gray-900 dark:text-gray-100">Total Estimated Cost</span>
-                            <span className="text-xl font-bold text-green-600">{formatCurrency(totalEstimatedCost)}</span>
-                        </div>
-
-                         <div className="grid grid-cols-2 gap-4 pt-2">
-                             <div className="space-y-1.5">
-                                <Label>Budget Code</Label>
-                                <Select value={costCenter} onValueChange={setCostCenter}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>{COST_CENTERS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                                </Select>
-                             </div>
-                             <div className="space-y-1.5">
-                                <Label>Payment Terms</Label>
-                                <Select value={paymentTerms} onValueChange={setPaymentTerms}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>{PAYMENT_TERMS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                                </Select>
-                             </div>
-                         </div>
-                    </div>
-                </section>
-
-                {/* Logistics */}
-                <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
-                     <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
-                        <Icon name="package" className="w-4 h-4" /> Supplier & Logistics
-                    </h3>
-                    
-                    <div className="space-y-4">
-                         <div className="space-y-1.5">
-                             <Label className={cn(errors.supplier && "text-red-500")}>Supplier *</Label>
-                             <Select value={supplierId} onValueChange={setSupplierId}>
-                                <SelectTrigger className={cn(errors.supplier && "border-red-500")}><SelectValue placeholder="Select Supplier" /></SelectTrigger>
-                                <SelectContent>{mockSuppliers.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-                             </Select>
-                             {errors.supplier && <p className="text-xs text-red-500">{errors.supplier}</p>}
-                         </div>
-                         <div className="space-y-1.5">
-                             <Label>Shipping Method</Label>
-                             <Select value={shippingMethod} onValueChange={setShippingMethod}>
-                                <SelectTrigger><SelectValue /></SelectTrigger>
-                                <SelectContent>{SHIPPING_METHODS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
-                             </Select>
-                         </div>
-                         
-                         <div className="grid grid-cols-2 gap-4">
-                             <div className="space-y-1.5">
-                                 <Label>Preferred Transporter</Label>
-                                 <Input placeholder="e.g. FedEx" />
-                             </div>
-                              <div className="space-y-1.5">
-                                 <Label>Import/Export Code</Label>
-                                 <Input placeholder="Optional" />
-                             </div>
-                         </div>
-                         
-                         <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800/50 p-3 rounded-lg">
-                             <Label className="cursor-pointer" htmlFor="insurance">Transit Insurance Required</Label>
-                             <Switch id="insurance" checked={insuranceRequired} onClick={() => setInsuranceRequired(!insuranceRequired)} />
-                         </div>
-                         
-                         <div className="space-y-1.5">
-                             <Label>Packaging Requirements</Label>
-                             <Input placeholder="e.g. Palletized, Double Box" />
-                         </div>
-                    </div>
-                </section>
-            </div>
-
-            {/* 4. APPROVAL WORKFLOW (Conditional) */}
-            {approvalRequired && (
-                 <section className="bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-200 dark:border-yellow-900/50 p-6 shadow-sm space-y-4">
-                    <div className="flex items-center gap-3 text-yellow-700 dark:text-yellow-500 mb-2">
-                        <Icon name="alertTriangle" className="w-5 h-5" />
-                        <h3 className="font-bold text-sm uppercase tracking-wider">Approval Required</h3>
-                    </div>
-                    <p className="text-sm text-yellow-800 dark:text-yellow-400">
-                        The estimated cost exceeds <strong>{formatCurrency(APPROVAL_THRESHOLD)}</strong>. Manager approval is required before processing.
-                    </p>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <Label className={errors.approver ? "text-red-500" : ""}>Approver *</Label>
-                            <Select value={approverId} onValueChange={setApproverId}>
-                                <SelectTrigger className={cn("bg-white dark:bg-zinc-900", errors.approver && "border-red-500")}><SelectValue placeholder="Select Manager" /></SelectTrigger>
-                                <SelectContent>
-                                    {mockTeamMembers.map(m => <SelectItem key={m.id} value={m.id}>{m.name} ({m.role || 'Staff'})</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            {errors.approver && <p className="text-xs text-red-500">{errors.approver}</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Approval Notes</Label>
-                            <Input value={approvalNotes} onChange={e => setApprovalNotes(e.target.value)} placeholder="Reason for high value order..." className="bg-white dark:bg-zinc-900" />
-                        </div>
-                    </div>
-                 </section>
-            )}
-
-            {/* 5. NOTES & ATTACHMENTS */}
-            <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-6">
-                 <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
-                    <Icon name="paperclip" className="w-4 h-4" /> Internal Notes & Docs
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <Label>Purchasing Team Notes</Label>
-                        <Textarea value={purchasingNotes} onChange={e => setPurchasingNotes(e.target.value)} className="min-h-[100px]" placeholder="Internal comments..." />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Warehouse Instructions</Label>
-                        <Textarea value={warehouseNotes} onChange={e => setWarehouseNotes(e.target.value)} className="min-h-[100px]" placeholder="Receiving instructions..." />
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <Label>Attachments</Label>
-                    <div className="border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-lg p-6 text-center hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer">
-                        <Icon name="paperclip" className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">Drag and drop files here, or click to browse (Quotes, Invoices, Specs)</p>
-                        <input type="file" className="hidden" multiple onChange={(e) => {
-                            if(e.target.files) setAttachments([...attachments, ...Array.from(e.target.files)]);
-                        }} />
-                    </div>
-                    {attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {attachments.map((f, i) => (
-                                <Badge key={i} variant="secondary" className="gap-2 pr-1">
-                                    {f.name} <button onClick={() => setAttachments(attachments.filter((_, idx) => idx !== i))}><Icon name="close" className="w-3 h-3" /></button>
-                                </Badge>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </section>
-
+          <NotesAndAttachmentsSection
+            purchasingNotes={purchasingNotes}
+            setPurchasingNotes={setPurchasingNotes}
+            warehouseNotes={warehouseNotes}
+            setWarehouseNotes={setWarehouseNotes}
+            attachments={attachments}
+            setAttachments={setAttachments}
+          />
         </div>
 
         {/* Footer */}
@@ -748,6 +458,761 @@ const CreateReplenishmentOrderDrawer: React.FC<CreateReplenishmentOrderDrawerPro
 
       </DrawerContent>
     </Drawer>
+  );
+};
+
+// --- Subcomponents ---------------------------------------------------------
+
+interface ProductInfoSectionProps {
+  mode: 'restock' | 'new';
+  selectedProduct: Product | null;
+  stockStatus: { text: string; variant: string };
+  avgDailySales: number;
+  recommendedQty: number;
+  errors: Record<string, string>;
+  isSearchOpen: boolean;
+  searchQuery: string;
+  setIsSearchOpen: (open: boolean) => void;
+  setSearchQuery: (value: string) => void;
+  filteredProducts: Product[];
+  onSelectProduct: (p: Product) => void;
+}
+
+const ProductInfoSection: React.FC<ProductInfoSectionProps> = ({
+  mode,
+  selectedProduct,
+  stockStatus,
+  avgDailySales,
+  recommendedQty,
+  errors,
+  isSearchOpen,
+  searchQuery,
+  setIsSearchOpen,
+  setSearchQuery,
+  filteredProducts,
+  onSelectProduct,
+}) => {
+  return (
+    <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 space-y-4">
+        <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
+          <Icon name="package" className="w-4 h-4" /> Product Information
+        </h3>
+
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-1 shadow-sm">
+          {mode === 'restock' ? (
+            <div className="p-4 flex items-start gap-4">
+              <div className="h-16 w-16 bg-gray-100 dark:bg-zinc-800 rounded-lg flex items-center justify-center shrink-0 border dark:border-zinc-700">
+                {selectedProduct?.images?.[0] ? (
+                  <img
+                    src={selectedProduct.images[0]}
+                    alt="Product"
+                    className="h-full w-full object-cover rounded-lg"
+                  />
+                ) : (
+                  <Icon name="image" className="w-8 h-8 text-gray-400" />
+                )}
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-900 dark:text-gray-100 text-lg">
+                  {selectedProduct?.name}
+                </h4>
+                <div className="flex gap-4 mt-1 text-sm text-gray-500">
+                  <span>
+                    SKU:{' '}
+                    <span className="font-mono text-gray-700 dark:text-gray-300">
+                      {selectedProduct?.sku}
+                    </span>
+                  </span>
+                  <span>Brand: {selectedProduct?.brand}</span>
+                  <span>Category: {selectedProduct?.category}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4">
+              <Label className={cn('mb-1.5 block', errors.product && 'text-red-500')}>
+                Search Product *
+              </Label>
+              <Popover open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                <PopoverTrigger asChild>
+                  <div className="relative">
+                    <Input
+                      placeholder="Type name, SKU or brand..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setIsSearchOpen(true);
+                      }}
+                      onFocus={() => setIsSearchOpen(true)}
+                      className={cn(
+                        'pl-10',
+                        errors.product && 'border-red-500 focus-visible:ring-red-500',
+                      )}
+                    />
+                    <Icon
+                      name="search"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none"
+                    />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent
+                  className="w-[var(--radix-popover-trigger-width)] p-0 max-h-[300px] overflow-y-auto"
+                  align="start"
+                >
+                  {filteredProducts.length > 0 ? (
+                    filteredProducts.map((p) => (
+                      <div
+                        key={p.id}
+                        onClick={() => onSelectProduct(p)}
+                        className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer flex justify-between items-center border-b last:border-0 dark:border-zinc-800"
+                      >
+                        <div>
+                          <p className="font-medium text-sm">{p.name}</p>
+                          <p className="text-xs text-gray-500 font-mono">{p.sku}</p>
+                        </div>
+                        <Badge
+                          variant={p.totalStock === 0 ? 'red' : 'green'}
+                          className="text-[10px] h-5"
+                        >
+                          {p.totalStock} in stock
+                        </Badge>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-center text-gray-500 text-sm">
+                      No products found
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
+              {errors.product && (
+                <p className="text-xs text-red-500 mt-1">{errors.product}</p>
+              )}
+            </div>
+          )}
+
+          {selectedProduct && (
+            <div className="grid grid-cols-4 gap-px bg-gray-100 dark:bg-zinc-800 border-t dark:border-zinc-800">
+              <div className="bg-white dark:bg-zinc-900 p-4">
+                <p className="text-xs text-gray-500 uppercase mb-1">Current Stock</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold">{selectedProduct.totalStock}</span>
+                  <Badge
+                    variant={stockStatus.variant as any}
+                    className="text-[10px] h-5 px-1.5"
+                  >
+                    {stockStatus.text}
+                  </Badge>
+                </div>
+              </div>
+              <div className="bg-white dark:bg-zinc-900 p-4">
+                <p className="text-xs text-gray-500 uppercase mb-1">Reorder / Safety</p>
+                <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                  {selectedProduct.stockRules?.reorderPoint}{' '}
+                  <span className="text-gray-400">/</span>{' '}
+                  {selectedProduct.stockRules?.safetyStock}
+                </span>
+              </div>
+              <div className="bg-white dark:bg-zinc-900 p-4">
+                <p className="text-xs text-gray-500 uppercase mb-1">Avg Daily Sales</p>
+                <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                  ~{avgDailySales}
+                </span>
+              </div>
+              <div className="bg-white dark:bg-zinc-900 p-4">
+                <p className="text-xs text-gray-500 uppercase mb-1">Max Stock</p>
+                <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                  1000
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="lg:col-span-1 space-y-4">
+        <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
+          <Icon name="activity" className="w-4 h-4" /> Quick Stats
+        </h3>
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900 rounded-xl p-4 space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-blue-700 dark:text-blue-300">
+              Recommended Qty
+            </span>
+            <span className="text-xl font-bold text-blue-700 dark:text-blue-300">
+              {recommendedQty}
+            </span>
+          </div>
+          <div className="h-px bg-blue-200 dark:bg-blue-800"></div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-blue-600 dark:text-blue-400">Last Vendor</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200">
+              {selectedProduct?.supplier?.name || 'N/A'}
+            </span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-blue-600 dark:text-blue-400">Last Price</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200">
+              {formatCurrency(selectedProduct?.pricing?.cost || 0)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-blue-600 dark:text-blue-400">Lead Time</span>
+            <span className="font-medium text-blue-800 dark:text-blue-200">
+              {selectedProduct?.supplier?.leadTime || '-'} Days
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+interface OrderDetailsSectionProps {
+  errors: Record<string, string>;
+  requestedBy: string;
+  setRequestedBy: (v: string) => void;
+  reason: string;
+  setReason: (v: string) => void;
+  priority: string;
+  setPriority: (v: string) => void;
+  warehouseId: string;
+  setWarehouseId: (v: string) => void;
+  storefrontOptions: string[];
+  storefrontIds: string[];
+  setStorefrontIds: (v: string[]) => void;
+  deliveryDate: string;
+  setDeliveryDate: (v: string) => void;
+  quantity: number;
+  setQuantity: (v: number) => void;
+  bufferQty: number;
+  setBufferQty: (v: number) => void;
+  selectedProduct: Product | null;
+}
+
+const OrderDetailsSection: React.FC<OrderDetailsSectionProps> = ({
+  errors,
+  requestedBy,
+  setRequestedBy,
+  reason,
+  setReason,
+  priority,
+  setPriority,
+  warehouseId,
+  setWarehouseId,
+  storefrontOptions,
+  storefrontIds,
+  setStorefrontIds,
+  deliveryDate,
+  setDeliveryDate,
+  quantity,
+  setQuantity,
+  bufferQty,
+  setBufferQty,
+  selectedProduct,
+}) => {
+  return (
+    <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-6">
+      <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
+        <Icon name="fileText" className="w-4 h-4" /> Order Specification
+      </h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-2">
+          <Label className={cn(errors.requestedBy && 'text-red-500')}>Requested By *</Label>
+          <Select value={requestedBy} onValueChange={setRequestedBy}>
+            <SelectTrigger className={cn(errors.requestedBy && 'border-red-500')}>
+              <SelectValue placeholder="Select Employee" />
+            </SelectTrigger>
+            <SelectContent>
+              {mockTeamMembers.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.requestedBy && (
+            <p className="text-xs text-red-500">{errors.requestedBy}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label>Order Reason</Label>
+          <Select value={reason} onValueChange={setReason}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {ORDER_REASONS.map((r) => (
+                <SelectItem key={r} value={r}>
+                  {r}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Priority</Label>
+          <Select value={priority} onValueChange={setPriority}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PRIORITIES.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {p}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-2">
+          <Label className={cn(errors.warehouse && 'text-red-500')}>
+            Destination Warehouse *
+          </Label>
+          <Select value={warehouseId} onValueChange={setWarehouseId}>
+            <SelectTrigger className={cn(errors.warehouse && 'border-red-500')}>
+              <SelectValue placeholder="Select Warehouse" />
+            </SelectTrigger>
+            <SelectContent>
+              {productLocations.map((l) => (
+                <SelectItem key={l.id} value={l.id}>
+                  {l.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.warehouse && (
+            <p className="text-xs text-red-500">{errors.warehouse}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label>Storefronts (Optional)</Label>
+          <MultiSelect
+            options={storefrontOptions}
+            value={storefrontIds}
+            onChange={setStorefrontIds}
+            placeholder="Select Storefronts"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className={cn(errors.deliveryDate && 'text-red-500')}>
+            Expected Delivery *
+          </Label>
+          <Input
+            type="date"
+            value={deliveryDate}
+            onChange={(e) => setDeliveryDate(e.target.value)}
+            className={cn(errors.deliveryDate && 'border-red-500')}
+          />
+          {errors.deliveryDate && (
+            <p className="text-xs text-red-500">{errors.deliveryDate}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="space-y-2">
+          <Label className={cn(errors.quantity && 'text-red-500')}>Required Qty *</Label>
+          <Input
+            type="number"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+            className={cn('font-bold', errors.quantity && 'border-red-500')}
+          />
+          {errors.quantity && <p className="text-xs text-red-500">{errors.quantity}</p>}
+        </div>
+        <div className="space-y-2">
+          <Label>Buffer Qty</Label>
+          <Input
+            type="number"
+            value={bufferQty}
+            onChange={(e) => setBufferQty(Number(e.target.value))}
+            placeholder="0"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>UOM</Label>
+          <Input
+            value={selectedProduct?.unitOfMeasurement || 'Piece'}
+            disabled
+            className="bg-gray-50 dark:bg-zinc-800 text-gray-500"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>MOQ</Label>
+          <Input
+            value={selectedProduct?.supplier?.supplierMOQ || 1}
+            disabled
+            className="bg-gray-50 dark:bg-zinc-800 text-gray-500"
+          />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+interface FinancialsAndLogisticsSectionProps {
+  errors: Record<string, string>;
+  unitCost: number;
+  setUnitCost: (v: number) => void;
+  taxPercent: number;
+  setTaxPercent: (v: number) => void;
+  freightCost: number;
+  setFreightCost: (v: number) => void;
+  additionalCharges: number;
+  setAdditionalCharges: (v: number) => void;
+  totalEstimatedCost: number;
+  costCenter: string;
+  setCostCenter: (v: string) => void;
+  paymentTerms: string;
+  setPaymentTerms: (v: string) => void;
+  supplierId: string;
+  setSupplierId: (v: string) => void;
+  shippingMethod: string;
+  setShippingMethod: (v: string) => void;
+  insuranceRequired: boolean;
+  setInsuranceRequired: (v: boolean) => void;
+}
+
+const FinancialsAndLogisticsSection: React.FC<FinancialsAndLogisticsSectionProps> = ({
+  unitCost,
+  setUnitCost,
+  taxPercent,
+  setTaxPercent,
+  freightCost,
+  setFreightCost,
+  additionalCharges,
+  setAdditionalCharges,
+  totalEstimatedCost,
+  costCenter,
+  setCostCenter,
+  paymentTerms,
+  setPaymentTerms,
+  supplierId,
+  setSupplierId,
+  shippingMethod,
+  setShippingMethod,
+  insuranceRequired,
+  setInsuranceRequired,
+  errors,
+}) => {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Financials */}
+      <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
+        <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
+          <Icon name="dollarSign" className="w-4 h-4" /> Financial Details
+        </h3>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label>Unit Cost</Label>
+            <Input
+              type="number"
+              value={unitCost}
+              onChange={(e) => setUnitCost(Number(e.target.value))}
+              className="w-32 text-right"
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Tax %</Label>
+            <Input
+              type="number"
+              value={taxPercent}
+              onChange={(e) => setTaxPercent(Number(e.target.value))}
+              className="w-32 text-right"
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Freight / Shipping</Label>
+            <Input
+              type="number"
+              value={freightCost}
+              onChange={(e) => setFreightCost(Number(e.target.value))}
+              className="w-32 text-right"
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Additional Charges</Label>
+            <Input
+              type="number"
+              value={additionalCharges}
+              onChange={(e) => setAdditionalCharges(Number(e.target.value))}
+              className="w-32 text-right"
+            />
+          </div>
+
+          <div className="border-t dark:border-zinc-800 pt-3 flex items-center justify-between">
+            <span className="font-bold text-gray-900 dark:text-gray-100">
+              Total Estimated Cost
+            </span>
+            <span className="text-xl font-bold text-green-600">
+              {formatCurrency(totalEstimatedCost)}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-2">
+            <div className="space-y-1.5">
+              <Label>Budget Code</Label>
+              <Select value={costCenter} onValueChange={setCostCenter}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {COST_CENTERS.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Payment Terms</Label>
+              <Select value={paymentTerms} onValueChange={setPaymentTerms}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_TERMS.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Logistics */}
+      <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-4">
+        <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
+          <Icon name="package" className="w-4 h-4" /> Supplier & Logistics
+        </h3>
+
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label className={cn(errors.supplier && 'text-red-500')}>Supplier *</Label>
+            <Select value={supplierId} onValueChange={setSupplierId}>
+              <SelectTrigger className={cn(errors.supplier && 'border-red-500')}>
+                <SelectValue placeholder="Select Supplier" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockSuppliers.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.supplier && (
+              <p className="text-xs text-red-500">{errors.supplier}</p>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label>Shipping Method</Label>
+            <Select value={shippingMethod} onValueChange={setShippingMethod}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SHIPPING_METHODS.map((m) => (
+                  <SelectItem key={m} value={m}>
+                    {m}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label>Preferred Transporter</Label>
+              <Input placeholder="e.g. FedEx" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Import/Export Code</Label>
+              <Input placeholder="Optional" />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-800/50 p-3 rounded-lg">
+            <Label className="cursor-pointer" htmlFor="insurance">
+              Transit Insurance Required
+            </Label>
+            <Switch
+              id="insurance"
+              checked={insuranceRequired}
+              onClick={() => setInsuranceRequired(!insuranceRequired)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Packaging Requirements</Label>
+            <Input placeholder="e.g. Palletized, Double Box" />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+interface ApprovalSectionProps {
+  approvalRequired: boolean;
+  approvalNotes: string;
+  setApprovalNotes: (v: string) => void;
+  approverId: string;
+  setApproverId: (v: string) => void;
+  errors: Record<string, string>;
+}
+
+const ApprovalSection: React.FC<ApprovalSectionProps> = ({
+  approvalRequired,
+  approvalNotes,
+  setApprovalNotes,
+  approverId,
+  setApproverId,
+  errors,
+}) => {
+  if (!approvalRequired) return null;
+
+  return (
+    <section className="bg-yellow-50 dark:bg-yellow-900/10 rounded-xl border border-yellow-200 dark:border-yellow-900/50 p-6 shadow-sm space-y-4">
+      <div className="flex items-center gap-3 text-yellow-700 dark:text-yellow-500 mb-2">
+        <Icon name="alertTriangle" className="w-5 h-5" />
+        <h3 className="font-bold text-sm uppercase tracking-wider">Approval Required</h3>
+      </div>
+      <p className="text-sm text-yellow-800 dark:text-yellow-400">
+        The estimated cost exceeds <strong>{formatCurrency(APPROVAL_THRESHOLD)}</strong>.
+        Manager approval is required before processing.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label className={errors.approver ? 'text-red-500' : ''}>Approver *</Label>
+          <Select value={approverId} onValueChange={setApproverId}>
+            <SelectTrigger
+              className={cn(
+                'bg-white dark:bg-zinc-900',
+                errors.approver && 'border-red-500',
+              )}
+            >
+              <SelectValue placeholder="Select Manager" />
+            </SelectTrigger>
+            <SelectContent>
+              {mockTeamMembers.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name} ({m.role || 'Staff'})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.approver && (
+            <p className="text-xs text-red-500">{errors.approver}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label>Approval Notes</Label>
+          <Input
+            value={approvalNotes}
+            onChange={(e) => setApprovalNotes(e.target.value)}
+            placeholder="Reason for high value order..."
+            className="bg-white dark:bg-zinc-900"
+          />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+interface NotesAndAttachmentsSectionProps {
+  purchasingNotes: string;
+  setPurchasingNotes: (v: string) => void;
+  warehouseNotes: string;
+  setWarehouseNotes: (v: string) => void;
+  attachments: File[];
+  setAttachments: (v: File[]) => void;
+}
+
+const NotesAndAttachmentsSection: React.FC<NotesAndAttachmentsSectionProps> = ({
+  purchasingNotes,
+  setPurchasingNotes,
+  warehouseNotes,
+  setWarehouseNotes,
+  attachments,
+  setAttachments,
+}) => {
+  return (
+    <section className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-6 shadow-sm space-y-6">
+      <h3 className="text-sm font-bold uppercase text-gray-500 tracking-wider flex items-center gap-2">
+        <Icon name="paperclip" className="w-4 h-4" /> Internal Notes & Docs
+      </h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <Label>Purchasing Team Notes</Label>
+          <Textarea
+            value={purchasingNotes}
+            onChange={(e) => setPurchasingNotes(e.target.value)}
+            className="min-h-[100px]"
+            placeholder="Internal comments..."
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Warehouse Instructions</Label>
+          <Textarea
+            value={warehouseNotes}
+            onChange={(e) => setWarehouseNotes(e.target.value)}
+            className="min-h-[100px]"
+            placeholder="Receiving instructions..."
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Attachments</Label>
+        <div className="border-2 border-dashed border-gray-200 dark:border-zinc-700 rounded-lg p-6 text-center hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer">
+          <Icon name="paperclip" className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">
+            Drag and drop files here, or click to browse (Quotes, Invoices, Specs)
+          </p>
+          <input
+            type="file"
+            className="hidden"
+            multiple
+            onChange={(e) => {
+              if (e.target.files) {
+                setAttachments([...attachments, ...Array.from(e.target.files)]);
+              }
+            }}
+          />
+        </div>
+        {attachments.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {attachments.map((f, i) => (
+              <Badge key={i} variant="secondary" className="gap-2 pr-1">
+                {f.name}
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAttachments(attachments.filter((_, idx) => idx !== i))
+                  }
+                >
+                  <Icon name="close" className="w-3 h-3" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
   );
 };
 

@@ -6,7 +6,43 @@ import { LeadsFilterDrawer } from "./LeadsFilterDrawer";
 import { Badge } from "../../../../components/ui/Badge";
 import { Card } from "../../../../components/ui/Card";
 
-const Toolbar = ({
+type ToolbarChangePayload = Partial<{
+  searchValue: string;
+  assignedValue: string;
+  stageValue: string;
+  priorityValue: string;
+  dateFrom: string;
+  dateTo: string;
+}>;
+
+type LeadsFilterState = {
+  assignedValue: string;
+  stageValue: string;
+  priorityValue: string;
+  dateFrom: string;
+  dateTo: string;
+};
+
+interface ToolbarProps {
+  assignees: string[];
+  stages: string[];
+  priorities: string[];
+  searchValue: string;
+  assignedValue: string;
+  stageValue: string;
+  priorityValue: string;
+  dateFrom: string;
+  dateTo: string;
+  onChange: (payload: ToolbarChangePayload) => void;
+  onRefresh: () => void;
+  onExport: () => void;
+  onImportFile: (file: File) => void;
+  onToggleView: () => void;
+  view: "kanban" | "table";
+  onNewLead: () => void;
+}
+
+const Toolbar: React.FC<ToolbarProps> = ({
   assignees,
   stages,
   priorities,
@@ -24,7 +60,7 @@ const Toolbar = ({
   view,
   onNewLead,
 }) => {
-  const fileRef = useRef(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const activeFilterCount =
@@ -33,7 +69,7 @@ const Toolbar = ({
     (priorityValue !== "All" ? 1 : 0) +
     (dateFrom || dateTo ? 1 : 0);
 
-  const handleApplyFilters = (filters) => {
+  const handleApplyFilters = (filters: LeadsFilterState) => {
     onChange(filters);
   };
 
@@ -58,7 +94,9 @@ const Toolbar = ({
           />
           <Input
             value={searchValue}
-            onChange={(e) => onChange({ searchValue: e.target.value })}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              onChange({ searchValue: e.target.value })
+            }
             placeholder="Search company or contact..."
             className="pl-9 h-9 w-full"
           />
@@ -95,15 +133,20 @@ const Toolbar = ({
             type="file"
             accept=".csv"
             className="hidden"
-            onChange={(e) =>
-              e.target.files[0] && onImportFile(e.target.files[0])
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const file = e.target.files?.[0] || null;
+              if (file) {
+                onImportFile(file);
+                // Allow selecting the same file again
+                e.target.value = "";
+              }
+            }}
           />
 
           <Button
             variant="outline"
             size="sm"
-            onClick={() => fileRef.current.click()}
+            onClick={() => fileRef.current?.click()}
           >
             <Icon name="arrowUp" className="mr-2 h-4 w-4" />
             Import

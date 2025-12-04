@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SocialService } from '../api/mockService';
-import { SocialPost, PLATFORM_CONFIG, Platform } from '../types';
+import { PLATFORM_CONFIG } from '../types';
+import type { SocialPost, Platform } from '../types';
 import { Card, CardContent } from '../../../../components/ui/Card';
 import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';

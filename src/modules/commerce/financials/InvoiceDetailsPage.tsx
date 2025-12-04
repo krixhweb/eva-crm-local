@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/Card';
 import { Badge } from '../../../components/ui/Badge';

@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Input } from '../ui/Input';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/Popover';
-import { Icon } from '../icons/Icon';
+import { Icon } from '../shared/icon';
 import { cn } from '../../lib/utils';
 import type { Customer } from '../../types';
 

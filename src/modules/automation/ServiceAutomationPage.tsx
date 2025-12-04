@@ -1,10 +1,8 @@
 
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { Icon } from "../../components/shared/icon";
-import type { ServiceAutomation } from '../../types';
 import { mockServiceAutomations } from '../../data/mockData';
 
 const ServiceAutomationPage = () => {
@@ -20,8 +18,8 @@ const ServiceAutomationPage = () => {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="p-3 rounded-lg bg-green-100/50 dark:bg-green-900/20 text-green-600">
-                    <Icon name={automation.iconName as keyof typeof Icon.icons} className="h-6 w-6" />
+                  <div className="p-3 rounded-lg bg-blue-100/50 dark:bg-blue-900/20 text-blue-600">
+                    <Icon name={automation.iconName} className="h-6 w-6" />
                   </div>
                   <div>
                     <CardTitle className="text-lg">{automation.name}</CardTitle>

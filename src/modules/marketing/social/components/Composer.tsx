@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { SocialAccount, SocialAttachment, LinkMetadata, Platform, PLATFORM_CONFIG } from '../types';
+import { PLATFORM_CONFIG } from '../types';
+import type { SocialAccount, SocialAttachment, LinkMetadata, Platform } from '../types';
 import { SocialService } from '../api/mockService';
 import { PostPreview } from './PostPreview';
 import { Button } from '../../../../components/ui/Button';

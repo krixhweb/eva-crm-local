@@ -8,20 +8,19 @@ import {
   DrawerFooter,
   DrawerDescription,
 }
- from "../../../../components/ui/Drawer";
-import { Button } from "../../../../components/ui/Button";
-import { Label } from "../../../../components/ui/Label";
-import { Input } from "../../../../components/ui/Input";
+ from "../../../components/ui/Drawer";
+import { Button } from "../../../components/ui/Button";
+import { Label } from "../../../components/ui/Label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../../components/ui/Select";
-import MultiSelect from "../../../../components/ui/MultiSelect";
-import { productLocations } from "../../../../data/inventoryMockData";
-import { DatePicker } from "../../../../components/ui/DatePicker";
+} from "../../../components/ui/Select";
+import MultiSelect from "../../../components/ui/MultiSelect";
+import { productLocations } from "../../../data/inventoryMockData";
+import { DatePicker } from "../../../components/ui/DatePicker";
 
 // Format utility (dd-mm-yyyy)
 const formatDate = (date: Date | null) => {
@@ -147,7 +146,7 @@ export const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
             <MultiSelect
               options={categories}
               value={filters.categories}
-              onChange={(v) => setFilters({ ...filters, categories: v })}
+              onChange={(v: string[]) => setFilters({ ...filters, categories: v })}
               placeholder="Select categories…"
             />
           </div>
@@ -157,7 +156,7 @@ export const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
             <Label>Status</Label>
             <Select
               value={filters.status}
-              onValueChange={(val) => setFilters({ ...filters, status: val })}
+              onValueChange={(val: string) => setFilters({ ...filters, status: val })}
             >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -173,12 +172,12 @@ export const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
             <Label>Warehouse Availability</Label>
             <Select
               value={filters.warehouse}
-              onValueChange={(val) => setFilters({ ...filters, warehouse: val })}
+              onValueChange={(val: string) => setFilters({ ...filters, warehouse: val })}
             >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All Warehouses</SelectItem>
-                {productLocations.map((loc) => (
+                {productLocations.map((loc: any) => (
                   <SelectItem key={loc.id} value={loc.id}>{loc.name}</SelectItem>
                 ))}
               </SelectContent>
@@ -214,7 +213,7 @@ export const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
                       ? parseDMY(filters.dateFrom)
                       : null
                   }
-                  onChange={(date) => {
+                  onChange={(date: Date | null) => {
                     setFilters((f) => ({
                       ...f,
                       dateFrom: date ? formatDate(date) : "",
@@ -248,7 +247,7 @@ export const ProductFilterDrawer: React.FC<ProductFilterDrawerProps> = ({
                       ? parseDMY(filters.dateTo)
                       : null
                   }
-                  onChange={(date) => {
+                  onChange={(date: Date | null) => {
                     setFilters((f) => ({
                       ...f,
                       dateTo: date ? formatDate(date) : "",

@@ -1,5 +1,5 @@
 
-import { SocialAccount, SocialPost, LinkMetadata } from '../types';
+import type { SocialAccount, SocialPost, LinkMetadata } from '../types';
 
 const MOCK_ACCOUNTS: SocialAccount[] = [
   { id: 'acc_1', provider: 'facebook', name: 'Eva CRM', username: '@evacrm', connectedAt: '2023-01-15', status: 'connected', followersCount: 12500 },

@@ -231,15 +231,10 @@ const TopNavBar: React.FC = () => {
 
           {/* Profile dropdown */}
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-dark-surface border dark:border-dark-border rounded-lg shadow-xl z-50 animate-in slide-in-from-top-2">
-              
-              <div className="p-4 border-b dark:border-dark-border bg-gray-50/50 dark:bg-white/5">
-                <p className="font-semibold text-sm dark:text-gray-200">John Doe</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">john.doe@example.com</p>
-              </div>
+            <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-dark-surface border dark:border-dark-border rounded-lg shadow-xl z-50 dropdown-animate">
 
               <div className="p-1">
-                <a className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-white/5"><Icon name="user" className="w-4 h-4" />My Profile</a>
+        
                 <button onClick={goSettings} className="flex items-center gap-3 px-4 py-2 text-sm w-full hover:bg-gray-100 dark:hover:bg-white/5"><Icon name="settings" className="w-4 h-4" />Settings</button>
               </div>
 

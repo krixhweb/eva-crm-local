@@ -390,7 +390,7 @@ const TasksTab: React.FC = () => {
             let matchesStatus = true;
             if (filters.status === 'Open') matchesStatus = t.status === 'Open' && !t.isOverdue;
             else if (filters.status === 'Completed') matchesStatus = t.status === 'Completed';
-            else if (filters.status === 'Overdue') matchesStatus = t.isOverdue && t.status !== 'Completed';
+            else if (filters.status === 'Overdue') matchesStatus = (t.isOverdue && t.status !== 'Completed') ?? false;
             
             const matchesDate = !selectedDate || t.dueDate === selectedDate;
             

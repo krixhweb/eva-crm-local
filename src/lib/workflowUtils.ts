@@ -1,5 +1,5 @@
 
-import { Workflow } from "../types/workflow";
+import type { Workflow } from "../types/workflow";
 
 // Safe evaluator for condition nodes
 // NOTE: In production, use a proper parser like jsep or a rule engine.

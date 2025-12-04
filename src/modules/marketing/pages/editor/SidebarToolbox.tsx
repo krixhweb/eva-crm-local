@@ -5,7 +5,8 @@ import { cn } from '../../../../lib/utils';
 import { Icon } from '../../../../components/shared/icon';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../../components/ui/Tabs';
 import type { BlockType } from './editorTypes';
-import { EMAIL_PRESETS, EmailPreset } from './emailPresets';
+import { EMAIL_PRESETS } from './emailPresets';
+import type { EmailPreset } from './emailPresets';
 
 const TOOLBOX_ITEMS: { type: BlockType; label: string; icon: string }[] = [
   { type: 'header', label: 'Header', icon: 'type' },

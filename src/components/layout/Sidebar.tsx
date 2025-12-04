@@ -103,17 +103,7 @@ const navGroups: NavGroup[] = [
       { label: 'Marketing Automation', path: '/automation/marketing', icon: 'megaphone', breadcrumb: ['Automation', 'Marketing Automation'] },
       { label: 'Service Automation', path: '/automation/service', icon: 'lifeBuoy', breadcrumb: ['Automation', 'Service Automation'] },
     ],
-  },
-  {
-    title: 'Settings',
-    icon: 'settings',
-    defaultOpen: false,
-    items: [
-      { label: 'Integrations', path: '/settings/integrations', icon: 'settings', breadcrumb: ['Settings', 'Integrations'] },
-      { label: 'Admin & Security', path: '/settings/admin', icon: 'settings', breadcrumb: ['Settings', 'Admin & Security'] },
-      { label: 'APIs & Webhooks', path: '/settings/api', icon: 'settings', breadcrumb: ['Settings', 'APIs & Webhooks'] },
-    ],
-  },
+  }
 ];
 
 /* --- Sidebar width constraints --- */
@@ -490,16 +480,19 @@ const Sidebar: React.FC = () => {
         {/* --- Collapse/Expand Button at Bottom --- */}
         <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#09090b]">
           <button
-            onClick={() => dispatch(toggleSidebar())}
-            className={cn(
-              "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-              "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800",
-              isSidebarOpen ? "justify-start" : "justify-center"
-            )}
-          >
-            <Icon name={isSidebarOpen ? "arrowLeft" : "chevronRight"} className="w-5 h-5" />
-            {isSidebarOpen && <span>Collapse Sidebar</span>}
-          </button>
+  onClick={() => dispatch(toggleSidebar())}
+  className={cn(
+    "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+    "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800",
+    isSidebarOpen ? "justify-start" : "justify-center"
+  )}
+>
+  <span className="w-5 h-5 flex items-center justify-center">
+    <Icon name={isSidebarOpen ? "arrowLeft" : "arrowRight"} className="w-5 h-5" />
+  </span>
+
+  {isSidebarOpen && <span>Collapse Sidebar</span>}
+</button>
         </div>
       </motion.aside>
     </>

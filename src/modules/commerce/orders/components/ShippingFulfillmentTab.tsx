@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/Card";
 import { Button } from "../../../../components/ui/Button";
-import { Icon } from "../../../../components/shared/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../../../components/ui/Select";
 import { Input } from "../../../../components/ui/Input";
 import { Label } from "../../../../components/ui/Label";

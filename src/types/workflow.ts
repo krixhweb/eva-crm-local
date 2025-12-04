@@ -1,5 +1,5 @@
 
-import { Edge, Node } from 'reactflow';
+import type { Edge, Node } from 'reactflow';
 
 export type NodeType = 'trigger' | 'condition' | 'action' | 'delay';
 

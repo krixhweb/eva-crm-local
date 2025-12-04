@@ -1,9 +1,8 @@
 
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/Card';
 import { Icon } from '../../../../components/shared/icon';
 import { formatCurrency } from '../../../../lib/utils';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 const timelineData = [
     { day: 'Mon', openRate: 22, clickRate: 2.5 },

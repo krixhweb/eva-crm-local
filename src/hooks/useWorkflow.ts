@@ -3,13 +3,11 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { 
   useNodesState, 
   useEdgesState, 
-  addEdge as rfAddEdge, 
-  Connection, 
-  Edge,
-  Node
+  addEdge as rfAddEdge
 } from 'reactflow';
+import type { Connection, Edge, Node } from 'reactflow';
 import { v4 as uuidv4 } from 'uuid';
-import { Workflow, WorkflowNode, WorkflowEdge } from '../types/workflow';
+import type { Workflow, WorkflowNode, WorkflowEdge } from '../types/workflow';
 import { useToast } from './use-toast';
 import { workflowApi } from '../lib/workflowUtils';
 

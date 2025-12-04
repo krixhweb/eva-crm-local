@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card } from '../ui/Card';
-import { Icon } from '../icons/Icon';
+import { Icon } from '../shared/icon';
 
 const DraggableNode = ({ type, label, icon, color, onDragStart }: any) => (
   <div 

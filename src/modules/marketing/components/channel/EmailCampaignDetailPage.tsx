@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../../../components/ui/Button';
 import { Icon } from '../../../../components/shared/icon';
@@ -9,7 +9,7 @@ import { formatCurrency } from '../../../../lib/utils';
 import { mockEmailCampaigns } from '../../../../data/emailMockData';
 import { CreateEmailDrawer } from './CreateEmailDrawer';
 import { useGlassyToasts } from '../../../../components/ui/GlassyToastProvider';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Cell, PieChart, Pie, Legend } from 'recharts';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, Cell, PieChart, Pie, Legend } from 'recharts';
 
 const EmailCampaignDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -209,7 +209,7 @@ const EmailCampaignDetailPage: React.FC = () => {
                              <ResponsiveContainer width="100%" height="100%">
                                  <PieChart>
                                      <Pie data={linkData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                                         {linkData.map((entry, index) => (
+                                         {linkData.map((_entry, index) => (
                                              <Cell key={`cell-${index}`} fill={['#3B82F6', '#10B981', '#F59E0B'][index % 3]} />
                                          ))}
                                      </Pie>

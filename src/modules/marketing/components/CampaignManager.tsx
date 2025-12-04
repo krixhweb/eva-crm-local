@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Icon } from "../../../components/shared/icon";
 import { CampaignTableView } from './CampaignTableView';
 import { CampaignCardView } from './CampaignCardView';
-import { CampaignFilterDrawer, CampaignFiltersState } from './CampaignFilterDrawer';
+import { CampaignFilterDrawer } from './CampaignFilterDrawer';
+import type { CampaignFiltersState } from './CampaignFilterDrawer';
 import { mockCampaigns } from '../../../data/mockData';
 import type { Campaign } from '../../../types';
 

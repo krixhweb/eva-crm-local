@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { cn } from '../../lib/utils';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '../../store/store';
+import { toggleDarkMode } from '../../store/uiSlice';
 
 /**
  * ThemeToggle
@@ -8,28 +11,15 @@ import { cn } from '../../lib/utils';
  * - Exports a named `ThemeToggle` component (TopNavBar imports this)
  */
 export const ThemeToggle: React.FC = () => {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    try {
-      const stored = localStorage.getItem('theme');
-      if (stored) return stored === 'dark';
-      return typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    } catch {
-      return false;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      document.documentElement.classList.toggle('dark', isDark);
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    } catch {
-      // ignore storage errors in restricted environments
-    }
-  }, [isDark]);
+  const dispatch = useDispatch();
+  const isDark = useSelector((state: RootState) => state.ui.isDarkMode);
 
   return (
     <button
-      onClick={() => setIsDark((v) => !v)}
+      onClick={() => {
+        console.debug('[ThemeToggle] click - current isDark:', isDark);
+        dispatch(toggleDarkMode());
+      }}
       aria-label="Toggle theme"
       title={isDark ? 'Switch to light' : 'Switch to dark'}
       className={cn(

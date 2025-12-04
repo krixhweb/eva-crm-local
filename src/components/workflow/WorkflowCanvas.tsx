@@ -5,9 +5,9 @@ import ReactFlow, {
   MiniMap, 
   Controls, 
   Background, 
-  useReactFlow,
-  Node
+  useReactFlow
 } from 'reactflow';
+import type { Node } from 'reactflow';
 import { TriggerNode, ActionNode, ConditionNode, DelayNode } from './CustomNodes';
 
 const nodeTypes = {

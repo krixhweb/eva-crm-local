@@ -7,7 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '../../../../components/ui/DropdownMenu';
 import { formatCurrency } from '../../../../lib/utils';
 import { StatusBadge } from '../../../../components/ui/StatusBadge';
-import { SalesOrderFilterDrawer, OrderFiltersState } from './SalesOrderFilterDrawer';
+import { SalesOrderFilterDrawer } from './SalesOrderFilterDrawer';
+import type { OrderFiltersState } from './SalesOrderFilterDrawer';
 import { SalesOrderDetailsDrawer } from './SalesOrderDetailsDrawer';
 import type { SalesOrder } from '../../../../types';
 

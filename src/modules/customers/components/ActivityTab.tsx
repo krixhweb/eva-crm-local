@@ -48,7 +48,7 @@ const formatActivityDetails = (activity: Activity): string => {
 const ActivityTab: React.FC = () => {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
 
-  const iconName = (type: string): keyof typeof Icon.icons => {
+  const iconName = (type: string): string => {
     switch (type) {
       case 'Order': return 'shoppingCart';
       case 'Ticket': return 'ticket';

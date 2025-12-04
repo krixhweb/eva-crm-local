@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Icon } from '../../../../components/shared/icon';
-import { Platform, SocialAttachment, LinkMetadata } from '../types';
+import type { Platform, SocialAttachment, LinkMetadata } from '../types';
 import { cn } from '../../../../lib/utils';
 
 interface PostPreviewProps {

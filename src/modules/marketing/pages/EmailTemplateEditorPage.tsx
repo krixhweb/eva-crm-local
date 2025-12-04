@@ -9,10 +9,9 @@ import {
   useSensor, 
   useSensors, 
   DragOverlay, 
-  defaultDropAnimationSideEffects, 
-  DragStartEvent, 
-  DragEndEvent, 
+  defaultDropAnimationSideEffects
 } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';

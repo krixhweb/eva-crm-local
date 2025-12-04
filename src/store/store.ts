@@ -14,3 +14,9 @@ export const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+// Expose store on window in development for easier debugging (inspect via console)
+if (import.meta.env && import.meta.env.DEV) {
+  try {
+    (window as any).__APP_STORE__ = store;
+  } catch (_) {}
+}

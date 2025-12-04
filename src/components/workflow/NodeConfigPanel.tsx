@@ -1,13 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { Node } from 'reactflow';
+import type { Node } from 'reactflow';
 import { Card } from '../ui/Card';
 import { Label } from '../ui/Label';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
-import { Icon } from '../icons/Icon';
+import { Icon } from '../shared/icon';
 
 interface NodeConfigPanelProps {
   selectedNode: Node | null;

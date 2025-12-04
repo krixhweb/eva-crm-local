@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/Card';
 import { Button } from '../../../../components/ui/Button';
 import { Icon } from '../../../../components/shared/icon';
-import { SocialPost, PLATFORM_CONFIG, Platform } from '../types';
+import { PLATFORM_CONFIG } from '../types';
+import type { SocialPost, Platform } from '../types';
 import { SocialService } from '../api/mockService';
 import { cn } from '../../../../lib/utils';
 

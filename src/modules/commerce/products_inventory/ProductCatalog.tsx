@@ -63,7 +63,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
             const matchesStatus = activeFilters.status === 'All' || p.status === activeFilters.status;
 
             // Warehouse Filter
-            const matchesWarehouse = activeFilters.warehouse === 'All' || p.locations.some(l => l.locationId === activeFilters.warehouse && l.stock > 0);
+            const matchesWarehouse = activeFilters.warehouse === 'All' || p.locations?.some(l => l.locationId === activeFilters.warehouse && l.stock > 0);
 
             // Date Filter
             let matchesDate = true;

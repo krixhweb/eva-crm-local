@@ -183,7 +183,7 @@ export const LeadsFilterDrawer: React.FC<LeadsFilterDrawerProps> = ({
             </Label>
             <DatePicker
               mode="range"
-              value={dateValue}
+              value={dateValue || null}
               onChange={handleDateChange}
               placeholder="Filter by Due Date"
               className="w-full h-11 bg-white dark:bg-zinc-900 border-gray-300 dark:border-zinc-700"

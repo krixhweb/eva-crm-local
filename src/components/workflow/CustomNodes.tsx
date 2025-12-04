@@ -1,7 +1,8 @@
 
 import React, { memo } from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
-import { Icon } from '../icons/Icon';
+import { Handle, Position } from 'reactflow';
+import type { NodeProps } from 'reactflow';
+import { Icon } from '../shared/icon';
 import { cn } from '../../lib/utils';
 
 // --- Base Node Shell ---

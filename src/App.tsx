@@ -1,9 +1,10 @@
-
 import React, { useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider, useSelector } from 'react-redux';
+import { Provider, useSelector, useDispatch } from 'react-redux';
 import { store } from './store/store';
 import type { RootState } from './store/store';
+import { setDarkMode } from './store/uiSlice';
+import { injectThemeTransitions, initializeTheme } from './lib/themeAnimations.ts'
 import Layout from './components/layout/Layout';
 import { GlassyToastProvider } from './components/ui/GlassyToastProvider';
 import PlaceholderPage from './components/ui/PlaceholderPage';
@@ -142,13 +143,28 @@ const AppContent: React.FC = () => {
 };
 
 const AppWrapper: React.FC = () => {
+  const dispatch = useDispatch();
   const isDarkMode = useSelector((state: RootState) => state.ui.isDarkMode);
 
+  // Initialize theme animations on mount
   useEffect(() => {
-    if (isDarkMode) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
+    // Inject transition styles
+    injectThemeTransitions();
+    
+    // Initialize theme from localStorage (without animation)
+    const theme = initializeTheme('light');
+    dispatch(setDarkMode(theme === 'dark'));
+  }, [dispatch]);
+
+  // Keep the root element class in sync with Redux state and persist
+  useEffect(() => {
+    console.debug('[AppWrapper] isDarkMode changed:', isDarkMode);
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    
+    try {
+      localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    } catch (e) {
+      console.error('[AppWrapper] Failed to persist theme:', e);
     }
   }, [isDarkMode]);
 
@@ -170,4 +186,3 @@ const App: React.FC = () => {
 }
 
 export default App;
-

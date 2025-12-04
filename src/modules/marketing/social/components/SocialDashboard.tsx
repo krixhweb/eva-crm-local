@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/Card';
 import { Icon } from '../../../../components/shared/icon';
 import { SocialService } from '../api/mockService';
-import { SocialPost, SocialAccount } from '../types';
+import type { SocialPost, SocialAccount } from '../types';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const KPICard = ({ title, value, icon, color, trend, trendUp, subtext }: any) => (

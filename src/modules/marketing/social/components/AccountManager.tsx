@@ -5,7 +5,8 @@ import { Button } from '../../../../components/ui/Button';
 import { Icon } from '../../../../components/shared/icon';
 import { Badge } from '../../../../components/ui/Badge';
 import { SocialService } from '../api/mockService';
-import { SocialAccount, PLATFORM_CONFIG } from '../types';
+import { PLATFORM_CONFIG } from '../types';
+import type { SocialAccount } from '../types';
 import { useGlassyToasts } from '../../../../components/ui/GlassyToastProvider';
 
 export const AccountManager = () => {

@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 import { Card } from "../../../../components/ui/Card";
 import { Button } from "../../../../components/ui/Button";
-import { Icon } from "../../../../components/icons/Icon";
+import { Icon } from "../../../../components/shared/icon";
 import {
   DropdownMenu,
   DropdownMenuTrigger,

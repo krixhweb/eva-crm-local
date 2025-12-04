@@ -5,7 +5,7 @@ import { Icon } from '../../../components/shared/icon';
 import { mockCommunications } from '../../../data/mockData';
 
 const CommunicationsTab: React.FC = () => {
-  const getIcon = (channel: string): keyof typeof Icon.icons => {
+  const getIcon = (channel: string): string => {
     switch(channel) {
       case 'Email': return 'mail';
       case 'SMS': return 'messageSquare';
