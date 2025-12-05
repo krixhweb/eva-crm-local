@@ -1,6 +1,6 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import { useDroppable } from '@dnd-kit/core';
 import { CSS } from "@dnd-kit/utilities";
 import { Icon } from "../../../../components/shared/icon";
 import { cn } from "../../../../lib/utils";
@@ -23,6 +23,7 @@ const SortableBlockCanva: React.FC<{
   blocksCount: number;
   selected: boolean;
   activeDragItem: any;
+  activeOverId?: string | null;
   previewMode: "desktop" | "mobile";
   onSelect: (id: string) => void;
   onDelete: () => void;
@@ -30,7 +31,7 @@ const SortableBlockCanva: React.FC<{
   onMoveUp: () => void;
   onMoveDown: () => void;
   onResize?: (id: string, height: number) => void;
-}> = ({ block, index, blocksCount, selected, activeDragItem, previewMode, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, onResize }) => {
+}> = ({ block, index, blocksCount, selected, activeDragItem, activeOverId, previewMode, onSelect, onDelete, onDuplicate, onMoveUp, onMoveDown, onResize }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id, data: block });
   const [hover, setHover] = useState(false);
   const isMobile = previewMode === 'mobile';
@@ -45,6 +46,11 @@ const SortableBlockCanva: React.FC<{
   // --- Mobile Scaling Factors ---
   const mobileScale = isMobile ? 0.85 : 1; // Scale font size
   const paddingScale = isMobile ? 0.7 : 1; // Scale padding
+
+  // Drop indicator logic
+  const isOver = activeOverId === block.id;
+  const isDraggingTool = activeDragItem?.isTool;
+  const showDropIndicator = isOver && isDraggingTool;
 
   // Spacer resizing logic
   const resizingRef = useRef(false);
@@ -102,6 +108,10 @@ const SortableBlockCanva: React.FC<{
         lineHeight: s.lineHeight,
         fontSize: s.fontSize ? `${s.fontSize * mobileScale}px` : undefined,
         fontWeight: s.fontWeight,
+        maxWidth: '100%',
+        overflowWrap: 'anywhere',
+        wordBreak: 'break-word',
+        boxSizing: 'border-box'
     };
 
     // Helper for Column Render (Nested)
@@ -115,7 +125,9 @@ const SortableBlockCanva: React.FC<{
                 flex: 1,
                 minWidth: 0, 
                 borderRadius: colData.borderRadius,
-                border: colData.border
+                border: colData.border,
+                maxWidth: '100%',
+                boxSizing: 'border-box'
             }}
             className="transition-colors"
         >
@@ -130,13 +142,14 @@ const SortableBlockCanva: React.FC<{
                             height: 'auto', 
                             borderRadius: 4, 
                             objectFit: 'cover',
-                            display: 'inline-block' // For center alignment
+                            display: 'block',
+                            margin: colData.textAlign === 'center' ? '0 auto' : (colData.textAlign === 'right' ? '0 0 0 auto' : '0')
                         }} 
                      />
                 </div>
             )}
             {(colData.headerText || colData.bodyText || colData.price) && (
-                <div style={{ marginBottom: colData.hasButton ? 12 * paddingScale : 0 }}>
+                <div style={{ marginBottom: colData.hasButton ? 12 * paddingScale : 0, wordBreak: 'break-word' }}>
                     {colData.headerText && <h4 style={{ margin: '0 0 4px', fontSize: `${18 * mobileScale}px`, fontWeight: 'bold', color: '#111' }}>{colData.headerText}</h4>}
                     {colData.price && <div style={{ fontWeight: 'bold', color: '#16a34a', marginBottom: '4px', fontSize: `${16 * mobileScale}px` }}>{colData.price}</div>}
                     {colData.bodyText && <div style={{ fontSize: `${14 * mobileScale}px`, color: '#555', whiteSpace: 'pre-line' }}>{colData.bodyText}</div>}
@@ -181,7 +194,8 @@ const SortableBlockCanva: React.FC<{
                             maxWidth: '100%', 
                             display: "inline-block", 
                             borderRadius: s.borderRadius, 
-                            objectFit: s.objectFit 
+                            objectFit: s.objectFit,
+                            height: 'auto'
                         }} 
                     />
                 ) : (
@@ -208,7 +222,8 @@ const SortableBlockCanva: React.FC<{
                         textDecoration: "none",
                         fontWeight: "bold",
                         width: isMobile || s.fullWidth ? "100%" : "auto",
-                        boxSizing: "border-box"
+                        boxSizing: "border-box",
+                        maxWidth: "100%"
                     }}
                 >
                     {c.text}
@@ -246,7 +261,7 @@ const SortableBlockCanva: React.FC<{
       case "social":
         return (
             <div style={commonStyles}>
-                <div style={{ display: "inline-flex", gap: (s.gap ?? 8) * paddingScale, alignItems: "center" }}>
+                <div style={{ display: "inline-flex", gap: (s.gap ?? 8) * paddingScale, alignItems: "center", flexWrap: 'wrap', justifyContent: s.textAlign === 'center' ? 'center' : s.textAlign === 'right' ? 'flex-end' : 'flex-start' }}>
                     {(c.socials || []).filter((x: any) => x.enabled).map((sn: any) => {
                         const IconComp = SocialIcons[sn.platform] || null;
                         const size = (s.iconSize || 32) * (isMobile ? 0.75 : 1);
@@ -269,7 +284,7 @@ const SortableBlockCanva: React.FC<{
         return (
             <div style={commonStyles}>
                 {c.html ? (
-                    <div dangerouslySetInnerHTML={{ __html: c.html }} />
+                    <div dangerouslySetInnerHTML={{ __html: c.html }} style={{ overflow: 'hidden', maxWidth: '100%' }} />
                 ) : (
                     <div className="p-4 bg-gray-100 border border-dashed border-gray-300 text-center text-xs font-mono text-gray-500">
                         Empty HTML Block
@@ -375,11 +390,8 @@ const SortableBlockCanva: React.FC<{
         )}
 
         {/* Drop Indicator */}
-        {activeDragItem && (
-             <div className={cn(
-                 "absolute h-1 bg-blue-500 rounded-full transition-opacity duration-200 left-0 right-0 z-50 pointer-events-none",
-                 activeDragItem.id !== block.id ? "opacity-0" : "opacity-100" 
-             )} />
+        {showDropIndicator && (
+             <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-500 z-50 pointer-events-none rounded-full shadow-sm transform translate-y-1/2" />
         )}
     </div>
   );
@@ -390,6 +402,7 @@ const EditorCanvas: React.FC<{
   previewMode: "desktop" | "mobile";
   canvasBg?: string;
   selectedBlockId?: string | null;
+  activeOverId?: string | null;
   onSelectBlock: (id: string | null) => void;
   onMoveUp: (index: number) => void;
   onMoveDown: (index: number) => void;
@@ -397,9 +410,14 @@ const EditorCanvas: React.FC<{
   onDelete: (id: string) => void;
   onResizeBlock?: (id: string, height: number) => void;
   activeDragItem?: any;
-}> = ({ blocks, previewMode, canvasBg = "#ffffff", selectedBlockId, onSelectBlock, onMoveUp, onMoveDown, onDuplicate, onDelete, onResizeBlock, activeDragItem }) => {
+}> = ({ blocks, previewMode, canvasBg = "#ffffff", selectedBlockId, activeOverId, onSelectBlock, onMoveUp, onMoveDown, onDuplicate, onDelete, onResizeBlock, activeDragItem }) => {
+  const { setNodeRef } = useDroppable({
+    id: 'canvas-background',
+  });
+
   return (
     <div 
+        ref={setNodeRef}
         className="flex-1 bg-gray-100/50 dark:bg-zinc-950/80 overflow-y-auto flex justify-center py-8 relative scroll-smooth"
         onClick={() => onSelectBlock(null)}
     >
@@ -445,6 +463,7 @@ const EditorCanvas: React.FC<{
                 blocksCount={blocks.length}
                 selected={selectedBlockId === block.id}
                 activeDragItem={activeDragItem}
+                activeOverId={activeOverId}
                 previewMode={previewMode}
                 onSelect={onSelectBlock}
                 onDelete={() => onDelete(block.id)}

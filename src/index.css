@@ -1,3 +1,74 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Add these CSS optimizations to improve drag and drop performance */
+
+/* Enable GPU acceleration for dragged items */
+[data-dnd-kit-draggable],
+[data-dnd-kit-droppable] {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Optimize transforms during drag */
+[data-dnd-kit-draggable][data-dragging="true"] {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  pointer-events: none;
+}
+
+/* Smooth transitions for drop zones */
+[data-dnd-kit-droppable] {
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+/* Reduce paint during drag */
+.dragging * {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Optimize canvas scrolling during drag */
+#canvas-droppable {
+  will-change: scroll-position;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text selection during drag */
+.dnd-context-active {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Optimize drag overlay rendering */
+.dnd-drag-overlay {
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Reduce repaints for blocks during drag */
+.email-block {
+  contain: layout style paint;
+  will-change: transform;
+}
+
+/* Optimize drop indicator */
+.drop-indicator {
+  transition: all 0.15s cubic-bezier(0.18, 0.67, 0.6, 1.22);
+  will-change: transform, opacity;
+}
+
+/* Performance boost for complex layouts */
+.email-canvas-container {
+  contain: layout;
+  isolation: isolate;
+}

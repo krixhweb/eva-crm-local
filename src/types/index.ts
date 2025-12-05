@@ -157,8 +157,7 @@ export interface EmailCampaign {
   previewText: string;
   fromName: string;
   fromEmail: string;
-  status: 'Draft' | 'Scheduled' | 'Sent' | 'Failed';
-  audience: string;
+  status: 'Draft' | 'Scheduled' | 'Sent' | 'Failed' | 'Active' | 'Paused';
   audienceCount: number;
   contentHtml: string;
   createdAt: string;
@@ -173,6 +172,8 @@ export interface EmailCampaign {
     revenue: number;
   };
   tags: string[];
+  audience: string;
+
 }
 
 export interface EmailTemplate {
@@ -634,51 +635,4 @@ export interface Notification {
 
 
 
-// ... existing code ...
-export interface EmailCampaign {
-  id: string;
-  name: string;
-  subject: string;
-  previewText: string;
-  fromName: string;
-  fromEmail: string;
-  status: 'Draft' | 'Scheduled' | 'Sent' | 'Failed';
-  audience: string;
-  audienceCount: number;
-  contentHtml: string;
-  createdAt: string;
-  scheduledFor?: string;
-  sentAt?: string;
-  stats: {
-    delivered: number;
-    opens: number;
-    clicks: number;
-    bounces: number;
-    unsubscribes: number;
-    revenue: number;
-  };
-  tags: string[];
-}
 
-export interface EmailTemplate {
-  id: string;
-  name: string;
-  category: string;
-  thumbnail: string;
-  contentHtml: string;
-  designJson: string; // JSON string representing the builder state
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-  usageCount: number;
-  campaignReferences?: string[];
-  analytics?: {
-    lastSentAt?: string;
-    avgOpenRate?: number;
-    avgClickRate?: number;
-    timesUsed?: number;
-  };
-}
-
-export interface Coupon extends AuditMetadata {
-// ... existing code ...

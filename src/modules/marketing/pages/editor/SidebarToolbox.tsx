@@ -5,8 +5,7 @@ import { cn } from '../../../../lib/utils';
 import { Icon } from '../../../../components/shared/icon';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../../components/ui/Tabs';
 import type { BlockType } from './editorTypes';
-import { EMAIL_PRESETS } from './emailPresets';
-import type { EmailPreset } from './emailPresets';
+import { EMAIL_PRESETS, type EmailPreset } from './emailPresets';
 
 const TOOLBOX_ITEMS: { type: BlockType; label: string; icon: string }[] = [
   { type: 'header', label: 'Header', icon: 'type' },
@@ -97,10 +96,10 @@ const SidebarToolbox: React.FC<SidebarToolboxProps> = ({ onApplyPreset }) => {
     return (
         <div className="w-64 bg-white dark:bg-zinc-900 border-r border-gray-200 dark:border-zinc-800 flex flex-col z-20 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
             <Tabs defaultValue="blocks" className="flex-1 flex flex-col">
-                <div className="px-4 pt-4">
-                    <TabsList className="w-full grid grid-cols-2 h-8 p-0.5 bg-gray-100 dark:bg-zinc-800 rounded-lg">
-                        <TabsTrigger value="blocks" className="text-[10px] h-full rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700">Blocks</TabsTrigger>
-                        <TabsTrigger value="layouts" className="text-[10px] h-full rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700">Layouts</TabsTrigger>
+                <div className="px-4 pt-4 pb-1">
+                    <TabsList className="w-full grid grid-cols-2 h-10 p-1 bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-visible border-none">
+                        <TabsTrigger value="blocks" className="text-xs font-medium h-full rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white text-gray-500 data-[state=active]:shadow-sm">Blocks</TabsTrigger>
+                        <TabsTrigger value="layouts" className="text-xs font-medium h-full rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white text-gray-500 data-[state=active]:shadow-sm">Layouts</TabsTrigger>
                     </TabsList>
                 </div>
                 
@@ -126,7 +125,7 @@ const SidebarToolbox: React.FC<SidebarToolboxProps> = ({ onApplyPreset }) => {
                     
                     <TabsContent value="layouts" className="mt-0 space-y-4">
                             <div className="grid grid-cols-1 gap-3">
-                                {EMAIL_PRESETS.map(preset => (
+                                { EMAIL_PRESETS.map(preset => (
                                     <PresetCard 
                                         key={preset.id} 
                                         preset={preset} 

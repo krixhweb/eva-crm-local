@@ -1,17 +1,17 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   DndContext, 
-  closestCenter, 
+  pointerWithin, 
   KeyboardSensor, 
   PointerSensor, 
   useSensor, 
   useSensors, 
   DragOverlay, 
-  defaultDropAnimationSideEffects
+  defaultDropAnimationSideEffects, 
 } from '@dnd-kit/core';
-import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent, DragOverEvent } from '@dnd-kit/core';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
@@ -42,6 +42,7 @@ const EmailTemplateEditorPage = () => {
     const [category, setCategory] = useState('Newsletter');
     const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
     const [activeDragItem, setActiveDragItem] = useState<any>(null);
+    const [activeOverId, setActiveOverId] = useState<string | null>(null);
     const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
     const [canvasBg, setCanvasBg] = useState('#ffffff');
     const [isTestModalOpen, setIsTestModalOpen] = useState(false);
@@ -290,36 +291,66 @@ const EmailTemplateEditorPage = () => {
 
     const handleDragStart = (event: DragStartEvent) => setActiveDragItem(event.active.data.current);
 
+    const handleDragOver = (event: DragOverEvent) => {
+        const { over } = event;
+        setActiveOverId(over ? String(over.id) : null);
+    };
+
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         setActiveDragItem(null);
+        setActiveOverId(null);
+        
         if (!over) return;
+
+        // Check if dropping on canvas or background
+        const isCanvasDrop = over.id === 'canvas-droppable' || over.id === 'canvas-background';
 
         if (active.data.current?.isTool) {
              const type = active.data.current.type as BlockType;
              const newBlock = getDefaultBlock(type);
              const newBlocks = [...blocks];
              
-             if (over.id === 'canvas-droppable') {
+             if (isCanvasDrop) {
+                 // Append to end if dropped on container but not specifically on a block
                  newBlocks.push(newBlock);
              } else {
+                 // Insert at specific index if dropped on another block
                  const idx = blocks.findIndex(b => b.id === over.id);
-                 if (idx !== -1) newBlocks.splice(idx + 1, 0, newBlock);
-                 else newBlocks.push(newBlock);
+                 if (idx !== -1) {
+                     newBlocks.splice(idx + 1, 0, newBlock);
+                 } else {
+                     // Fallback to append
+                     newBlocks.push(newBlock);
+                 }
              }
              updateBlocks(newBlocks);
              setSelectedBlockId(newBlock.id);
         } else if (active.id !== over.id) {
             const oldIndex = blocks.findIndex(b => b.id === active.id);
             const newIndex = blocks.findIndex(b => b.id === over.id);
-            if (oldIndex !== -1 && newIndex !== -1) moveBlock(oldIndex, newIndex);
+            
+            if (oldIndex !== -1) {
+                // If dropped on background/canvas, move to end
+                if (isCanvasDrop) {
+                    moveBlock(oldIndex, blocks.length - 1);
+                } else if (newIndex !== -1) {
+                    moveBlock(oldIndex, newIndex);
+                }
+            }
         }
     };
 
     const selectedBlock = blocks.find(b => b.id === selectedBlockId) || null;
 
     return (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <DndContext 
+            sensors={sensors} 
+            collisionDetection={pointerWithin} 
+            onDragStart={handleDragStart} 
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+        >
             <div className="flex flex-col h-screen bg-gray-50 dark:bg-black overflow-hidden">
                 {/* Top Bar */}
                 <header className="h-14 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-4 flex items-center justify-between shrink-0 z-30">
@@ -369,6 +400,7 @@ const EmailTemplateEditorPage = () => {
                         onDelete={deleteBlock}
                         onResizeBlock={(id, h) => updateBlock(id, 'styles', 'height', h)}
                         activeDragItem={activeDragItem}
+                        activeOverId={activeOverId}
                     />
 
                     <PropertiesPanel 
@@ -380,13 +412,17 @@ const EmailTemplateEditorPage = () => {
                     />
                 </div>
 
-                <DragOverlay dropAnimation={{ sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: '0.5' } } }) }}>
-                    {activeDragItem?.isTool ? (
-                        <div className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 text-xs font-bold cursor-grabbing transform scale-105 ring-2 ring-white">
-                             <Icon name="plus" className="w-3 h-3" /> Add {activeDragItem.label}
-                        </div>
-                    ) : null}
-                </DragOverlay>
+                {/* Drag Overlay Portaled to Body to prevent clipping */}
+                {createPortal(
+                    <DragOverlay dropAnimation={{ sideEffects: defaultDropAnimationSideEffects({ styles: { active: { opacity: '0.5' } } }) }} zIndex={9999}>
+                        {activeDragItem?.isTool ? (
+                            <div className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 text-xs font-bold cursor-grabbing transform scale-105 ring-2 ring-white z-[9999]">
+                                <Icon name="plus" className="w-3 h-3" /> Add {activeDragItem.label}
+                            </div>
+                        ) : null}
+                    </DragOverlay>,
+                    document.body
+                )}
 
                 <SendTestEmailModal isOpen={isTestModalOpen} onClose={() => setIsTestModalOpen(false)} templateName={templateName} />
             </div>

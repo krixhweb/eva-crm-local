@@ -1,4 +1,3 @@
-/* Sidebar.tsx — App navigation with groups, nested items, collapse, and drag-to-resize */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -9,35 +8,33 @@ import { Icon } from '../shared/icon';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
-/* --- Types for navigation structure --- */
 interface SubItem {
-  label: string;
-  path: string;
-  icon: string;
-  breadcrumb: string[];
+    label: string;
+    path: string;
+    icon: string;
+    breadcrumb: string[];
 }
 
 interface NavItem {
-  label: string;
-  path: string;
-  icon: string;
-  breadcrumb: string[];
-  new?: boolean;
-  subItems?: SubItem[];
+    label: string;
+    path: string;
+    icon: string;
+    breadcrumb: string[];
+    new?: boolean;
+    subItems?: SubItem[];
 }
 
 interface NavGroup {
-  title: string;
-  icon: string;
-  defaultOpen: boolean;
-  items: NavItem[];
+    title: string;
+    icon: string;
+    defaultOpen: boolean;
+    items: NavItem[];
 }
 
-/* --- Navigation data: groups, items, sub-items --- */
 const navGroups: NavGroup[] = [
   {
     title: '360° Overview',
-    icon: 'analytics',
+    icon: 'home',
     defaultOpen: true,
     items: [
       { label: 'Dashboard', path: '/dashboard', icon: 'dashboard', breadcrumb: ['360° Overview', 'Dashboard'] },
@@ -51,16 +48,16 @@ const navGroups: NavGroup[] = [
     defaultOpen: false,
     items: [
       { label: 'Campaigns Management', path: '/marketing/campaigns', icon: 'megaphone', breadcrumb: ['Marketing', 'Campaigns Management'] },
-      {
-        label: 'Channel Marketing',
-        path: '#',
-        icon: 'send',
-        breadcrumb: ['Marketing', 'Channel Marketing'],
-        subItems: [
-          { label: 'Email Marketing', path: '/marketing/channel/email', icon: 'mail', breadcrumb: ['Marketing', 'Channel Marketing', 'Email'] },
-          { label: 'WhatsApp Marketing', path: '/marketing/channel/whatsapp', icon: 'messageCircle', breadcrumb: ['Marketing', 'Channel Marketing', 'WhatsApp'] },
-          { label: 'Social Publisher', path: '/marketing/channel/social', icon: 'share', breadcrumb: ['Marketing', 'Channel Marketing', 'Social'] },
-        ],
+      { 
+          label: 'Channel Marketing', 
+          path: '#', 
+          icon: 'send', 
+          breadcrumb: ['Marketing', 'Channel Marketing'],
+          subItems: [
+              { label: 'Email Marketing', path: '/marketing/channel/email', icon: 'mail', breadcrumb: ['Marketing', 'Channel Marketing', 'Email'] },
+              { label: 'WhatsApp Marketing', path: '/marketing/channel/whatsapp', icon: 'messageCircle', breadcrumb: ['Marketing', 'Channel Marketing', 'WhatsApp'] },
+              { label: 'Social Publisher', path: '/marketing/channel/social', icon: 'share', breadcrumb: ['Marketing', 'Channel Marketing', 'Social'] },
+          ]
       },
       { label: 'Coupon Management', path: '/marketing/coupons', icon: 'ticket', breadcrumb: ['Marketing', 'Coupon Management'] },
     ],
@@ -103,396 +100,376 @@ const navGroups: NavGroup[] = [
       { label: 'Marketing Automation', path: '/automation/marketing', icon: 'megaphone', breadcrumb: ['Automation', 'Marketing Automation'] },
       { label: 'Service Automation', path: '/automation/service', icon: 'lifeBuoy', breadcrumb: ['Automation', 'Service Automation'] },
     ],
-  }
+  },
 ];
 
-/* --- Sidebar width constraints --- */
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 const COLLAPSED_WIDTH = 64;
 
 const Sidebar: React.FC = () => {
-  /* --- Redux state: open/collapsed & width --- */
   const { isSidebarOpen, sidebarWidth } = useSelector((state: RootState) => state.ui);
   const dispatch = useDispatch();
-
-  /* --- Router location (used to highlight active items) --- */
   const location = useLocation();
-
-  /* --- Track which groups are expanded --- */
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(
-    () => navGroups.reduce<Record<string, boolean>>((acc, group) => { acc[group.title] = group.defaultOpen || false; return acc; }, {})
+  
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => 
+    navGroups.reduce((acc, group) => {
+        acc[group.title] = group.defaultOpen || false;
+        return acc;
+    }, {} as Record<string, boolean>)
   );
 
-  /* --- Track expanded nested menu items --- */
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
-
-  /* --- Drag-to-resize sidebar --- */
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
 
-  /* --- Begin resizing mouse drag --- */
+  // --- Resizing Logic ---
   const startResizing = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsResizing(true);
   }, []);
 
-  /* --- Stop resize drag --- */
-  const stopResizing = useCallback(() => setIsResizing(false), []);
+  const stopResizing = useCallback(() => {
+    setIsResizing(false);
+  }, []);
 
-  /* --- Handle drag movement to adjust width --- */
   const resize = useCallback(
     (mouseMoveEvent: MouseEvent) => {
-      if (!isResizing) return;
+      if (isResizing) {
+        const newWidth = mouseMoveEvent.clientX;
+        
+        // Snap to closed if dragged too small
+        if (newWidth < 150) {
+             if (isSidebarOpen) dispatch(setSidebarOpen(false));
+             return;
+        }
 
-      const newWidth = mouseMoveEvent.clientX; // new width from X pos
+        // Open if dragged out
+        if (!isSidebarOpen && newWidth > 150) {
+            dispatch(setSidebarOpen(true));
+        }
 
-      if (newWidth < 150) {
-        if (isSidebarOpen) dispatch(setSidebarOpen(false)); // snap closed
-        return;
+        if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) {
+          dispatch(setSidebarWidth(newWidth));
+        }
       }
-
-      if (!isSidebarOpen && newWidth > 150) dispatch(setSidebarOpen(true)); // reopen when dragged outward
-
-      if (newWidth >= MIN_WIDTH && newWidth <= MAX_WIDTH) dispatch(setSidebarWidth(newWidth)); // apply width
     },
     [isResizing, isSidebarOpen, dispatch]
   );
 
-  /* --- Attach global mouse events during resize --- */
   useEffect(() => {
     if (isResizing) {
-      window.addEventListener("mousemove", resize);
-      window.addEventListener("mouseup", stopResizing);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
+        window.addEventListener("mousemove", resize);
+        window.addEventListener("mouseup", stopResizing);
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none'; // Prevent text selection
     } else {
-      window.removeEventListener("mousemove", resize);
-      window.removeEventListener("mouseup", stopResizing);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+        window.removeEventListener("mousemove", resize);
+        window.removeEventListener("mouseup", stopResizing);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
     }
-
     return () => {
-      window.removeEventListener("mousemove", resize);
-      window.removeEventListener("mouseup", stopResizing);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+        window.removeEventListener("mousemove", resize);
+        window.removeEventListener("mouseup", stopResizing);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
     };
   }, [isResizing, resize, stopResizing]);
 
-  /* --- Auto-expand active group and item based on URL --- */
+  // --- Auto-expand Logic ---
   useEffect(() => {
-    let activeGroup = '';
-    let activeParentItem = '';
+    let activeGroupTitle = '';
+    let activeItemLabel = '';
 
     for (const group of navGroups) {
       for (const item of group.items) {
-        if (item.path === location.pathname) {
-          activeGroup = group.title;
-          dispatch(setBreadcrumb(item.breadcrumb)); // set breadcrumb
-          break;
-        }
-
-        if (item.subItems) {
-          const activeSub = item.subItems.find(sub => sub.path === location.pathname);
-          if (activeSub) {
-            activeGroup = group.title;
-            activeParentItem = item.label; // expand parent item
-            dispatch(setBreadcrumb(activeSub.breadcrumb));
-            break;
+          if (item.path === location.pathname) {
+              activeGroupTitle = group.title;
+              break;
           }
-        }
+          if (item.subItems) {
+              const activeSub = item.subItems.find(sub => sub.path === location.pathname);
+              if (activeSub) {
+                  activeGroupTitle = group.title;
+                  activeItemLabel = item.label;
+                  dispatch(setBreadcrumb(activeSub.breadcrumb));
+                  break;
+              }
+          }
+          if (item.path === location.pathname) {
+             dispatch(setBreadcrumb(item.breadcrumb));
+          }
       }
-      if (activeGroup) break;
+      if (activeGroupTitle) break;
     }
 
-    if (activeGroup && !openGroups[activeGroup]) {
-      setOpenGroups(
-        Object.fromEntries(Object.keys(openGroups).map(g => [g, g === activeGroup]))
-      );
+    if (activeGroupTitle && !openGroups[activeGroupTitle]) {
+      setOpenGroups(Object.keys(openGroups).reduce((acc, key) => {
+        acc[key] = key === activeGroupTitle;
+        return acc;
+      }, {} as Record<string, boolean>));
     }
-
-    if (activeParentItem) {
-      setExpandedItems(prev => ({ ...prev, [activeParentItem]: true }));
+    
+    if (activeItemLabel) {
+        setExpandedItems(prev => ({ ...prev, [activeItemLabel]: true }));
     }
-  }, [location.pathname]);
+  }, [location.pathname, dispatch]);
 
-  /* --- Toggle main group open/close --- */
   const handleGroupToggle = (title: string) => {
     if (!isSidebarOpen) {
       dispatch(setSidebarOpen(true));
-      setOpenGroups(Object.fromEntries(Object.keys(openGroups).map(g => [g, g === title])));
-      return;
+      setOpenGroups(Object.keys(openGroups).reduce((acc, key) => {
+         acc[key] = key === title;
+         return acc;
+       }, {} as Record<string, boolean>));
+    } else {
+      setOpenGroups(prev => {
+        const isClosing = prev[title];
+        if (isClosing) {
+            return { ...prev, [title]: false };
+        } else {
+             return Object.keys(prev).reduce((acc, key) => {
+                 acc[key] = key === title;
+                 return acc;
+             }, {} as Record<string, boolean>);
+        }
+      });
     }
-
-    setOpenGroups(prev => {
-      const isClosing = prev[title];
-      if (isClosing) return { ...prev, [title]: false };
-
-      return Object.fromEntries(Object.keys(prev).map(g => [g, g === title]));
-    });
   };
 
-  /* --- Toggle sub-item expansion --- */
   const handleItemExpand = (e: React.MouseEvent, label: string) => {
-    e.preventDefault();
-
-    if (!isSidebarOpen) {
-      dispatch(setSidebarOpen(true));
-      setExpandedItems(prev => ({ ...prev, [label]: true }));
-      return;
-    }
-
-    setExpandedItems(prev => ({ ...prev, [label]: !prev[label] }));
+      e.preventDefault();
+      if (!isSidebarOpen) {
+          dispatch(setSidebarOpen(true));
+          setExpandedItems(prev => ({ ...prev, [label]: true }));
+      } else {
+          setExpandedItems(prev => ({ ...prev, [label]: !prev[label] }));
+      }
   };
 
-  /* --- Calculate actual width (collapsed → fixed small width) --- */
+  // Calculate the actual width to render
   const currentWidth = isSidebarOpen ? sidebarWidth : COLLAPSED_WIDTH;
 
   return (
     <>
-      {/* --- Mobile overlay when sidebar open --- */}
-      <div
+      {/* Overlay for mobile when expanded */}
+      <div 
         className={cn(
-          "fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity duration-300",
-          isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            "fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity duration-300",
+            isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
         onClick={() => dispatch(setSidebarOpen(false))}
-      />
-
-      {/* --- Sidebar container with animated width --- */}
+      ></div>
+      
       <motion.aside
         ref={sidebarRef as any}
-        animate={{ width: currentWidth }}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        {...({
+            animate: { width: currentWidth },
+            transition: { type: "spring", stiffness: 400, damping: 30 }
+        } as any)}
         className={cn(
-          "flex flex-col z-40 fixed md:relative h-full bg-white dark:bg-[#09090b] flex-shrink-0 border-r border-gray-200 dark:border-zinc-800 shadow-xl md:shadow-none group/sidebar",
-          isResizing && "transition-none"
+            "flex flex-col z-40 fixed md:relative h-full bg-white dark:bg-[#09090b] flex-shrink-0 border-r border-gray-200 dark:border-zinc-800 shadow-xl md:shadow-none group/sidebar",
+            isResizing ? "transition-none" : "transition-width" // Disable transition during drag for 1:1 tracking
         )}
       >
-
-        {/* --- Drag Handle (resizer) --- */}
+        {/* --- Resizer Handle --- */}
         <div
-          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500 transition-colors z-50 opacity-0 hover:opacity-100 group-hover/sidebar:opacity-50 active:bg-blue-600 active:opacity-100"
-          onMouseDown={startResizing}
-          title="Drag to resize"
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500 transition-colors z-50 opacity-0 hover:opacity-100 group-hover/sidebar:opacity-50 active:bg-blue-600 active:opacity-100"
+            onMouseDown={startResizing}
+            title="Drag to resize"
         />
 
-        {/* --- Sidebar Header: Logo --- */}
-        <div
-          className={cn(
-            "p-5 flex items-center h-16 border-b border-gray-100 dark:border-zinc-800 overflow-hidden",
-            isSidebarOpen ? "justify-start" : "justify-center"
-          )}
-        >
-          <Icon name="sparkles" className="w-7 h-7 text-green-600 flex-shrink-0" />
-          {isSidebarOpen && (
-            <motion.span
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-xl font-bold text-gray-900 dark:text-white ml-3 whitespace-nowrap"
-            >
-              EVA CRM
-            </motion.span>
-          )}
+        {/* Header */}
+        <div className={cn("p-5 flex items-center h-16 border-b border-gray-100 dark:border-zinc-800 overflow-hidden", isSidebarOpen ? "justify-start" : "justify-center")}>
+            <Icon name="sparkles" className="w-7 h-7 text-green-600 flex-shrink-0" />
+            {isSidebarOpen && (
+                <motion.span 
+                    {...({
+                        initial: { opacity: 0, x: -10 },
+                        animate: { opacity: 1, x: 0 },
+                        transition: { delay: 0.1 }
+                    } as any)}
+                    className="text-xl font-bold text-gray-900 dark:text-white ml-3 tracking-tight whitespace-nowrap"
+                >
+                    EVA CRM
+                </motion.span>
+            )}
         </div>
-
-        {/* --- Navigation Section --- */}
-        <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-1 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-zinc-800">
+        
+        {/* Navigation Items */}
+        <nav className="flex-1 px-3 py-4 overflow-y-auto overflow-x-hidden space-y-1 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-zinc-800">
           {navGroups.map(group => (
-            <div key={group.title}>
-
-              {/* --- Main Group Button --- */}
+            <div key={group.title} className="mb-1">
               <button
                 onClick={() => handleGroupToggle(group.title)}
                 title={isSidebarOpen ? '' : group.title}
                 className={cn(
-                  "w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-all group",
-                  openGroups[group.title]
-                    ? "text-gray-900 dark:text-white bg-gray-100/80 dark:bg-zinc-800/80"
-                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50",
-                  isSidebarOpen ? "justify-between" : "justify-center"
+                    "w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 group",
+                    openGroups[group.title] 
+                        ? "text-gray-900 dark:text-white bg-gray-100/80 dark:bg-zinc-800/80" 
+                        : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-gray-200",
+                    isSidebarOpen ? "justify-between" : "justify-center"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <Icon
-                    name={group.icon as any}
+                  <Icon 
+                    name={group.icon as any} 
                     className={cn(
-                      "w-5 h-5 flex-shrink-0",
-                      openGroups[group.title] ? "text-green-600" : "text-gray-400 group-hover:text-gray-600"
-                    )}
+                        "w-5 h-5 flex-shrink-0 transition-colors", 
+                        openGroups[group.title] ? "text-green-600" : "text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-300"
+                    )} 
                   />
-                  {isSidebarOpen && <span className="whitespace-nowrap">{group.title}</span>}
+                  {isSidebarOpen && (
+                      <span className="whitespace-nowrap overflow-hidden text-ellipsis">{group.title}</span>
+                  )}
                 </div>
-
                 {isSidebarOpen && (
-                  <Icon
-                    name="chevronDown"
-                    className={cn(
-                      "w-4 h-4 text-gray-400 transition-transform",
-                      openGroups[group.title] && "rotate-180"
-                    )}
-                  />
+                    <Icon 
+                        name="chevronDown" 
+                        className={cn(
+                            "w-4 h-4 text-gray-400 transition-transform duration-200", 
+                            openGroups[group.title] ? "rotate-180 text-gray-600" : ""
+                        )} 
+                    />
                 )}
               </button>
-
-              {/* --- Group Items (animated open/close) --- */}
+              
               <AnimatePresence initial={false}>
-                {isSidebarOpen && openGroups[group.title] && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="space-y-0.5 pt-1 pb-2">
+                  {isSidebarOpen && openGroups[group.title] && (
+                    <motion.div
+                        {...({
+                            initial: { height: 0, opacity: 0 },
+                            animate: { height: "auto", opacity: 1 },
+                            exit: { height: 0, opacity: 0 },
+                            transition: { duration: 0.2, ease: "easeInOut" }
+                        } as any)}
+                        className="overflow-hidden"
+                    >
+                      <div className="space-y-0.5 pt-1 pb-2">
+                        {group.items.map(item => {
+                            if (item.subItems) {
+                                const isExpanded = expandedItems[item.label];
+                                const isParentActive = item.subItems.some(sub => sub.path === location.pathname);
+                                
+                                return (
+                                    <div key={item.label}>
+                                        <button
+                                            onClick={(e) => handleItemExpand(e, item.label)}
+                                            className={cn(
+                                                "w-full flex items-center justify-between py-2 pr-3 pl-10 rounded-md text-sm transition-all duration-200 group relative",
+                                                isParentActive 
+                                                    ? "text-gray-900 dark:text-white font-medium"
+                                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
+                                            )}
+                                        >
+                                           <div className="flex items-center gap-3 overflow-hidden">
+                                              <Icon name={item.icon as any} className={cn("w-4 h-4 flex-shrink-0 transition-colors", isParentActive ? "text-green-600" : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300")} />
+                                              <span className="whitespace-nowrap truncate">{item.label}</span>
+                                           </div>
+                                           <Icon 
+                                              name="chevronDown" 
+                                              className={cn(
+                                                  "w-3 h-3 transition-transform duration-200 opacity-50 group-hover:opacity-100", 
+                                                  isExpanded ? "rotate-180" : ""
+                                              )} 
+                                           />
+                                        </button>
+                                        
+                                        <AnimatePresence>
+                                            {isExpanded && (
+                                                <motion.div
+                                                    {...({
+                                                        initial: { height: 0, opacity: 0 },
+                                                        animate: { height: "auto", opacity: 1 },
+                                                        exit: { height: 0, opacity: 0 },
+                                                        transition: { duration: 0.2, ease: "easeInOut" }
+                                                    } as any)}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="space-y-0.5 mt-0.5 mb-1">
+                                                        {item.subItems.map(sub => {
+                                                            const isActive = location.pathname === sub.path;
+                                                            return (
+                                                            <Link
+                                                                key={sub.label}
+                                                                to={sub.path}
+                                                                className={cn(
+                                                                    "group flex items-center gap-3 py-1.5 pr-3 pl-[3.25rem] rounded-r-md text-[13px] transition-all duration-200 relative",
+                                                                    isActive
+                                                                        ? "text-green-700 dark:text-green-400 font-semibold bg-green-50/50 dark:bg-green-900/10"
+                                                                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50/50 dark:hover:bg-zinc-800/50"
+                                                                )}
+                                                            >
+                                                                <div className={cn("absolute left-0 top-1 bottom-1 w-0.5 rounded-r transition-colors", isActive ? "bg-green-500" : "bg-transparent")}></div>
+                                                                
+                                                                <Icon 
+                                                                    name={sub.icon as any} 
+                                                                    className={cn(
+                                                                        "w-3.5 h-3.5 flex-shrink-0 transition-colors",
+                                                                        isActive ? "text-green-600 dark:text-green-500" : "text-gray-400 group-hover:text-gray-500 dark:text-zinc-500 dark:group-hover:text-zinc-400"
+                                                                    )} 
+                                                                />
+                                                                <span className="whitespace-nowrap truncate">{sub.label}</span>
+                                                            </Link>
+                                                        )})}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                );
+                            }
 
-                      {/* --- Loop through items inside the group --- */}
-                      {group.items.map(item => {
-                        /* --- Nested items (has subItems) --- */
-                        if (item.subItems) {
-                          const isExpanded = expandedItems[item.label];
-                          const isParentActive = item.subItems.some(sub => sub.path === location.pathname);
-
-                          return (
-                            <div key={item.label}>
-                              <button
-                                onClick={(e) => handleItemExpand(e, item.label)}
+                            const isActive = location.pathname === item.path;
+                            return (
+                              <Link
+                                key={item.label}
+                                to={item.path}
                                 className={cn(
-                                  "w-full flex items-center justify-between py-2 pr-3 pl-10 rounded-md text-sm transition-all group",
-                                  isParentActive
-                                    ? "text-gray-900 dark:text-white"
-                                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
+                                    "flex items-center gap-3 py-2 pr-3 pl-10 rounded-md text-sm transition-all duration-200 relative group",
+                                    isActive
+                                      ? "text-green-700 dark:text-green-400 font-semibold bg-green-50/50 dark:bg-green-900/10"
+                                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                                 )}
                               >
-                                <div className="flex items-center gap-3 overflow-hidden">
-                                  <Icon
-                                    name={item.icon}
-                                    className={cn(
-                                      "w-4 h-4",
-                                      isParentActive ? "text-green-600" : "text-gray-400 group-hover:text-gray-600"
-                                    )}
-                                  />
-                                  <span className="truncate">{item.label}</span>
-                                </div>
-
-                                <Icon
-                                  name="chevronDown"
-                                  className={cn(
-                                    "w-3 h-3 transition-transform",
-                                    isExpanded && "rotate-180"
-                                  )}
-                                />
-                              </button>
-
-                              {/* --- Render sub-items --- */}
-                              <AnimatePresence>
-                                {isExpanded && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="space-y-0.5 mt-0.5 mb-1">
-                                      {item.subItems.map(sub => {
-                                        const isActive = location.pathname === sub.path;
-
-                                        return (
-                                          <Link
-                                            key={sub.label}
-                                            to={sub.path}
-                                            className={cn(
-                                              "group flex items-center gap-3 py-1.5 pr-3 pl-[3.25rem] rounded-r-md text-[13px] transition-all relative",
-                                              isActive
-                                                ? "text-green-700 dark:text-green-400 font-semibold bg-green-50/50 dark:bg-green-900/10"
-                                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900"
-                                            )}
-                                          >
-                                            {isActive && <div className="absolute left-0 top-1 bottom-1 w-0.5 bg-green-500"></div>}
-
-                                            <Icon
-                                              name={sub.icon}
-                                              className={cn(
-                                                "w-3.5 h-3.5",
-                                                isActive ? "text-green-600" : "text-gray-400 group-hover:text-gray-500"
-                                              )}
-                                            />
-
-                                            <span className="truncate">{sub.label}</span>
-                                          </Link>
-                                        );
-                                      })}
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </div>
-                          );
-                        }
-
-                        /* --- Normal non-nested nav item --- */
-                        const isActive = location.pathname === item.path;
-
-                        return (
-                          <Link
-                            key={item.label}
-                            to={item.path}
-                            className={cn(
-                              "flex items-center gap-3 py-2 pr-3 pl-10 rounded-md text-sm transition-all relative group",
-                              isActive
-                                ? "text-green-700 dark:text-green-400 font-semibold bg-green-50/50 dark:bg-green-900/10"
-                                : "text-gray-600 dark:text-gray-400 hover:text-gray-900"
-                            )}
-                          >
-                            {isActive && <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-green-500"></div>}
-
-                            <Icon
-                              name={item.icon}
-                              className={cn(
-                                "w-4 h-4",
-                                isActive ? "text-green-600" : "text-gray-400 group-hover:text-gray-600"
-                              )}
-                            />
-
-                            <span className="truncate">{item.label}</span>
-
-                            {item.new && (
-                              <span className="ml-auto text-[9px] font-bold bg-green-500 text-white rounded-full px-1.5 py-0.5">
-                                NEW
-                              </span>
-                            )}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
+                                <>
+                                    {isActive && <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-green-500 rounded-r"></div>}
+                                    <Icon 
+                                        name={item.icon as any} 
+                                        className={cn(
+                                            "w-4 h-4 flex-shrink-0 transition-colors", 
+                                            isActive ? "text-green-600" : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
+                                        )}
+                                    />
+                                    <span className="whitespace-nowrap truncate">{item.label}</span>
+                                    {item.new && <span className="ml-auto text-[9px] font-bold bg-green-500 text-white rounded-full px-1.5 py-0.5">NEW</span>}
+                                </>
+                              </Link>
+                            );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
               </AnimatePresence>
             </div>
           ))}
         </nav>
-
-        {/* --- Collapse/Expand Button at Bottom --- */}
-        <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#09090b]">
-          <button
-  onClick={() => dispatch(toggleSidebar())}
-  className={cn(
-    "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-    "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800",
-    isSidebarOpen ? "justify-start" : "justify-center"
-  )}
->
-  <span className="w-5 h-5 flex items-center justify-center">
-    <Icon name={isSidebarOpen ? "arrowLeft" : "arrowRight"} className="w-5 h-5" />
-  </span>
-
-  {isSidebarOpen && <span>Collapse Sidebar</span>}
-</button>
+        
+        {/* Bottom Collapse Toggle */}
+        <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#09090b] overflow-hidden">
+            <button
+              onClick={() => dispatch(toggleSidebar())}
+              className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200",
+                  "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-gray-100",
+                  isSidebarOpen ? "justify-start" : "justify-center"
+              )}
+              title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+            >
+                <Icon name={isSidebarOpen ? "arrowLeft" : "chevronRight"} className="w-5 h-5 flex-shrink-0" />
+                {isSidebarOpen && <span className="whitespace-nowrap overflow-hidden text-ellipsis">Collapse Sidebar</span>}
+            </button>
         </div>
       </motion.aside>
     </>

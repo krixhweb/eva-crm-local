@@ -1,5 +1,5 @@
 
-import { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
@@ -19,7 +19,6 @@ import { mockEmailCampaigns } from '../../data/emailMockData';
 import type { EmailCampaign } from '../../types';
 import { useGlassyToasts } from '../../components/ui/GlassyToastProvider';
 import ConfirmationDialog from '../../components/modals/ConfirmationDialog';
-import { EmailAnalyticsTab } from './components/channel/EmailAnalyticsTab';
 
 const DEFAULT_FILTERS: EmailFiltersState = {
     status: [],
@@ -45,7 +44,7 @@ const EmailMarketingPage: React.FC = () => {
     
     // Pagination & Sorting
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 20;
+    const [itemsPerPage, setItemsPerPage] = useState(20);
     const [sortConfig, setSortConfig] = useState<{ key: keyof EmailCampaign | string, direction: 'asc' | 'desc' }>({ key: 'createdAt', direction: 'desc' });
     
     // Selection & Actions
@@ -231,7 +230,6 @@ const EmailMarketingPage: React.FC = () => {
                 <TabsList className="mb-6">
                     <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
                     <TabsTrigger value="templates">Templates</TabsTrigger>
-                    <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="campaigns" className="space-y-6">
@@ -341,12 +339,12 @@ const EmailMarketingPage: React.FC = () => {
                                                             {c.sentAt ? new Date(c.sentAt).toLocaleDateString() : c.scheduledFor ? new Date(c.scheduledFor).toLocaleDateString() : new Date(c.createdAt).toLocaleDateString()}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                            {['Sent','Active'].includes(c.status as string) ? (
+                                                            {c.status === 'Sent' || c.status === 'Active' ? (
                                                                 <span className={`font-medium ${openRate > 20 ? 'text-green-600' : 'text-gray-600'}`}>{openRate.toFixed(1)}%</span>
                                                             ) : '-'}
                                                         </TableCell>
                                                         <TableCell className="text-right">
-                                                             {['Sent','Active'].includes(c.status as string) ? (
+                                                             {c.status === 'Sent' || c.status === 'Active' ? (
                                                                 <span className="font-medium">{clickRate.toFixed(1)}%</span>
                                                              ) : '-'}
                                                         </TableCell>
@@ -370,7 +368,7 @@ const EmailMarketingPage: React.FC = () => {
                                                                     <DropdownMenuItem onClick={() => handleDuplicate(c)}>
                                                                         <Icon name="copy" className="w-4 h-4 mr-2"/> Duplicate
                                                                     </DropdownMenuItem>
-                                                                    <DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => setDeleteTarget(c.id)}>
+                                                                    <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => setDeleteTarget(c.id)}>
                                                                         <Icon name="trash" className="w-4 h-4 mr-2"/> Delete
                                                                     </DropdownMenuItem>
                                                                 </DropdownMenuContent>
@@ -402,10 +400,6 @@ const EmailMarketingPage: React.FC = () => {
                 
                 <TabsContent value="templates" className="mt-6">
                     <EmailTemplatesTab />
-                </TabsContent>
-                
-                <TabsContent value="analytics" className="mt-6">
-                     <EmailAnalyticsTab />
                 </TabsContent>
             </Tabs>
 
